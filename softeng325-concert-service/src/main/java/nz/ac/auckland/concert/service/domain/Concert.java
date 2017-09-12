@@ -1,6 +1,7 @@
 package nz.ac.auckland.concert.service.domain;
 
 import nz.ac.auckland.concert.common.types.PriceBand;
+import nz.ac.auckland.concert.service.domain.jpa.LocalDateTimeConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -9,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,8 +36,9 @@ public class Concert implements Comparable<Concert> {
 
 	@ElementCollection
 	@CollectionTable(name = "CONCERT_DATES")
+	@Convert(converter = LocalDateTimeConverter.class)
 	@JoinColumn(name = "id", nullable = false)
-	private Set<Concert_Date> _dates;
+	private Set<LocalDateTime> _dates;
 
 	@ElementCollection
 	@CollectionTable(name = "CONCERT_TARIFS")
@@ -67,11 +70,11 @@ public class Concert implements Comparable<Concert> {
 		_title = title;
 	}
 
-	public Set<Concert_Date> getDates() {
+	public Set<LocalDateTime> getDates() {
 		return _dates;
 	}
 
-	public void setDates(Set<Concert_Date> dates) {
+	public void setDates(Set<LocalDateTime> dates) {
 		_dates = dates;
 	}
 

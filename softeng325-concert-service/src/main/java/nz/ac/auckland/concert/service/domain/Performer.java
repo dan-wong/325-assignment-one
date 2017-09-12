@@ -80,21 +80,6 @@ public class Performer {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("Performer, id: ");
-		buffer.append(_id);
-		buffer.append(", name: ");
-		buffer.append(_name);
-		buffer.append(", s3 image: ");
-		buffer.append(_s3ImageUri);
-		buffer.append(", genre: ");
-		buffer.append(_genre.toString());
-
-		return buffer.toString();
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Performer))
 			return false;
