@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.service.domain;
 
+import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -7,7 +8,8 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashSet;
+import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,11 +35,17 @@ public class Concert implements Comparable<Concert> {
 	@ElementCollection
 	@CollectionTable(name = "CONCERT_DATES")
 	@JoinColumn(name = "id", nullable = false)
-	private Set<Concert_Date> _dates = new HashSet<>();
+	private Set<Concert_Date> _dates;
 
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@ElementCollection
+	@CollectionTable(name = "CONCERT_TARIFS")
 	@JoinColumn(name = "id", nullable = false)
-	private Performer _performer;
+	private Map<PriceBand, BigDecimal> _tariff;
+
+	@ElementCollection
+	@CollectionTable(name = "CONCERT_PERFORMER")
+	@JoinColumn(name = "id", nullable = false)
+	private Set<Performer> _performers;
 
 	// Required for JPA and JAXB.
 	protected Concert() {
@@ -67,27 +75,20 @@ public class Concert implements Comparable<Concert> {
 		_dates = dates;
 	}
 
-	public void setPerformer(Performer performer) {
-		_performer = performer;
+	public Map<PriceBand, BigDecimal> getTariff() {
+		return _tariff;
 	}
 
-	public Performer getPerformer() {
-		return _performer;
+	public void setTariffs(Map<PriceBand, BigDecimal> tariff) {
+		_tariff = tariff;
 	}
 
-	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("Concert, id: ");
-		buffer.append(_id);
-		buffer.append(", title: ");
-		buffer.append(_title);
-		buffer.append(", date: ");
-		buffer.append(_dates.toString());
-		buffer.append(", featuring: ");
-		buffer.append(_performer.getName());
+	public Set<Performer> getPerformers() {
+		return _performers;
+	}
 
-		return buffer.toString();
+	public void setPerformers(Set<Performer> performers) {
+		_performers = performers;
 	}
 
 	@Override
