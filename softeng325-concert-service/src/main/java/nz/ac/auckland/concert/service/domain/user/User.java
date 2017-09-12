@@ -1,4 +1,4 @@
-package nz.ac.auckland.concert.service.domain;
+package nz.ac.auckland.concert.service.domain.user;
 
 import nz.ac.auckland.concert.service.domain.concert.Booking;
 

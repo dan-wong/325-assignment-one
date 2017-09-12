@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.service.domain.concert;
 
+import nz.ac.auckland.concert.common.types.Genre;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
