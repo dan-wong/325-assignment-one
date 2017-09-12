@@ -1,6 +1,9 @@
 package nz.ac.auckland.concert.service.domain;
 
+import nz.ac.auckland.concert.service.domain.concert.Booking;
+
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "USER")
@@ -20,6 +23,9 @@ public class User {
 
 	@Column(name = "lastname", nullable = false)
 	private String _lastName;
+
+	@ElementCollection
+	private Set<Booking> _bookings;
 
 	protected User() {
 	}

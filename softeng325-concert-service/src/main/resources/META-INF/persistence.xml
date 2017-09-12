@@ -23,8 +23,8 @@
 	     
 	<persistence-unit name="nz.ac.auckland.concert">
 		<!-- Specify each class to map using a class element -->
-        <class>nz.ac.auckland.concert.service.domain.Concert</class>
-        <class>nz.ac.auckland.concert.service.domain.Performer</class>
+        <class>nz.ac.auckland.concert.service.domain.concert.Concert</class>
+        <class>nz.ac.auckland.concert.service.domain.concert.Performer</class>
         <class>nz.ac.auckland.concert.service.domain.Concert_Date</class>
 		<properties>
 			<!--  Configure the data source. In this case the embedded H2 database

@@ -1,11 +1,11 @@
-package nz.ac.auckland.concert.service.domain;
+package nz.ac.auckland.concert.service.domain.concert;
 
-import nz.ac.auckland.concert.common.dto.SeatDTO;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
@@ -23,8 +23,9 @@ public class Booking {
 	@Column(nullable = false)
 	private LocalDateTime _dateTime;
 
+	@ElementCollection
 	@Column(nullable = false)
-	private Set<SeatDTO> _seats;
+	private Set<Seat> _seats;
 
 	@Column(nullable = false)
 	private PriceBand _priceBand;
