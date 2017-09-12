@@ -37,12 +37,10 @@ public class Concert implements Comparable<Concert> {
 	@ElementCollection
 	@CollectionTable(name = "CONCERT_DATES")
 	@Convert(converter = LocalDateTimeConverter.class)
-	@JoinColumn(name = "id", nullable = false)
 	private Set<LocalDateTime> _dates;
 
 	@ElementCollection
 	@CollectionTable(name = "CONCERT_TARIFS")
-	@JoinColumn(name = "id", nullable = false)
 	private Map<PriceBand, BigDecimal> _tariff;
 
 	@ElementCollection
