@@ -1,6 +1,5 @@
 package nz.ac.auckland.concert.service.domain;
 
-import nz.ac.auckland.concert.service.domain.jpa.LocalDateTimeConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -8,7 +7,8 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class to represent a Concert. A Concert is characterised by an unique ID,
@@ -29,22 +29,27 @@ public class Concert implements Comparable<Concert> {
 	@Column(nullable = false)
 	private String _title;
 
-	@Convert(converter = LocalDateTimeConverter.class)
-	private LocalDateTime _date;
+	@ElementCollection
+	@CollectionTable(name = "CONCERT_DATES")
+	@JoinColumn(name = "id", nullable = false)
+	private Set<Concert_Date> _dates = new HashSet<>();
 
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	@JoinColumn(name = "id", nullable = false)
 	private Performer _performer;
 
-	public Concert(Long id, String title, LocalDateTime date, Performer performer) {
+	public Concert(Long id, String title, Set<Concert_Date> dates, Performer performer) {
 		_id = id;
 		_title = title;
-		_date = date;
+		_dates = dates;
 		_performer = performer;
 	}
 
-	public Concert(String title, LocalDateTime date, Performer performer) {
-		this(null, title, date, performer);
+	public Concert(Long id, String title) {
+		_id = id;
+		_title = title;
+		_dates = null;
+		_performer = null;
 	}
 
 	// Required for JPA and JAXB.
@@ -67,12 +72,12 @@ public class Concert implements Comparable<Concert> {
 		_title = title;
 	}
 
-	public LocalDateTime getDate() {
-		return _date;
+	public Set<Concert_Date> getDates() {
+		return _dates;
 	}
 
-	public void setDate(LocalDateTime date) {
-		_date = date;
+	public void setDates(Set<Concert_Date> dates) {
+		_dates = dates;
 	}
 
 	public Performer getPerformer() {
@@ -87,7 +92,7 @@ public class Concert implements Comparable<Concert> {
 		buffer.append(", title: ");
 		buffer.append(_title);
 		buffer.append(", date: ");
-		buffer.append(_date.toString());
+		buffer.append(_dates.toString());
 		buffer.append(", featuring: ");
 		buffer.append(_performer.getName());
 
@@ -104,7 +109,7 @@ public class Concert implements Comparable<Concert> {
 		Concert rhs = (Concert) obj;
 		return new EqualsBuilder().
 				append(_title, rhs.getTitle()).
-				append(_date, rhs.getDate()).
+				append(_dates, rhs.getDates()).
 				isEquals();
 	}
 
