@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * of an image file, and a genre.
  */
 @Entity
+@Table(name = "PERFORMERS")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Performer {

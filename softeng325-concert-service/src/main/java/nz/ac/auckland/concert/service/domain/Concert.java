@@ -19,6 +19,7 @@ import java.util.Set;
  * based on their title value.
  */
 @Entity
+@Table(name = "CONCERT")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Concert implements Comparable<Concert> {
@@ -37,20 +38,6 @@ public class Concert implements Comparable<Concert> {
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	@JoinColumn(name = "id", nullable = false)
 	private Performer _performer;
-
-	public Concert(Long id, String title, Set<Concert_Date> dates, Performer performer) {
-		_id = id;
-		_title = title;
-		_dates = dates;
-		_performer = performer;
-	}
-
-	public Concert(Long id, String title) {
-		_id = id;
-		_title = title;
-		_dates = null;
-		_performer = null;
-	}
 
 	// Required for JPA and JAXB.
 	protected Concert() {
@@ -78,6 +65,10 @@ public class Concert implements Comparable<Concert> {
 
 	public void setDates(Set<Concert_Date> dates) {
 		_dates = dates;
+	}
+
+	public void setPerformer(Performer performer) {
+		_performer = performer;
 	}
 
 	public Performer getPerformer() {
