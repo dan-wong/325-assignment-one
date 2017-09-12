@@ -1,14 +1,13 @@
 package nz.ac.auckland.concert.common.dto;
 
+import nz.ac.auckland.concert.common.types.PriceBand;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import nz.ac.auckland.concert.common.types.PriceBand;
 
 /**
  * DTO class to represent bookings (confirmed reservations). 
@@ -69,7 +68,7 @@ public class BookingDTO {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof SeatDTO))
+		if (!(obj instanceof BookingDTO))
 			return false;
 		if (obj == this)
 			return true;
