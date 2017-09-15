@@ -30,8 +30,8 @@ public class Performer {
 	@Column(name = "IMAGE", nullable = false)
 	private String _s3ImageUri;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "GENRE", nullable = false)
-	@Enumerated
 	private Genre _genre;
 
 	@ManyToMany(mappedBy = "_performers")

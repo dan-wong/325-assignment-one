@@ -1,6 +1,5 @@
 package nz.ac.auckland.concert.service.domain.concert;
 
-import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -8,8 +7,6 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,8 +33,7 @@ public class Concert implements Comparable<Concert> {
 	private Set<ConcertDates> _dates;
 
 	@ElementCollection
-	@CollectionTable(name = "CONCERT_TARIFS")
-	private Map<PriceBand, BigDecimal> _tariff;
+	private Set<ConcertTariffs> _tariff;
 
 	@ManyToMany
 	@JoinTable(name = "CONCERT_PERFORMER")
@@ -61,14 +57,6 @@ public class Concert implements Comparable<Concert> {
 
 	public void setTitle(String title) {
 		_title = title;
-	}
-
-	public Map<PriceBand, BigDecimal> getTariff() {
-		return _tariff;
-	}
-
-	public void setTariffs(Map<PriceBand, BigDecimal> tariff) {
-		_tariff = tariff;
 	}
 
 	public Set<Performer> getPerformers() {
