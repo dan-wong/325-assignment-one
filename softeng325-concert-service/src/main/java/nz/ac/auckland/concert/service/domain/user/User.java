@@ -12,20 +12,24 @@ public class User {
 	@GeneratedValue
 	private Long _id;
 
-	@Column(name = "username", nullable = false)
+	@Column(name = "USERNAME", nullable = false)
 	private String _username;
 
-	@Column(name = "password", nullable = false)
+	@Column(name = "PASSWORD", nullable = false)
 	private String _password;
 
-	@Column(name = "firstname", nullable = false)
+	@Column(name = "FIRST_NAME", nullable = false)
 	private String _firstName;
 
-	@Column(name = "lastname", nullable = false)
+	@Column(name = "LAST_NAME", nullable = false)
 	private String _lastName;
 
 	@ElementCollection
 	private Set<Booking> _bookings;
+
+	@Embedded
+	@Column(name = "CREDIT_CARD")
+	private CreditCard _creditCard;
 
 	protected User() {
 	}
