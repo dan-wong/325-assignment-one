@@ -4,30 +4,31 @@ import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Embeddable
+@Entity
 @Table(name = "BOOKING")
 public class Booking {
-	@Column(nullable = false)
+	@Id
+	@GeneratedValue
+	private Long _id;
+
+	@Column(name = "CONCERT_ID", nullable = false)
 	private Long _concertId;
 
-	@Column(nullable = false)
+	@Column(name = "CONCERT_TITLE", nullable = false)
 	private String _concertTitle;
 
-	@Column(nullable = false)
+	@Column(name = "DATE_TIME", nullable = false)
 	private LocalDateTime _dateTime;
 
 	@ElementCollection
-	@Column(nullable = false)
+	@Column(name = "SEATS", nullable = false)
 	private Set<Seat> _seats;
 
-	@Column(nullable = false)
+	@Column(name = "PRICE_BAND", nullable = false)
 	private PriceBand _priceBand;
 
 	protected Booking() {
@@ -41,7 +42,9 @@ public class Booking {
 			return true;
 
 		Booking rhs = (Booking) obj;
-		return new EqualsBuilder().append(_concertId, rhs._concertId)
+		return new EqualsBuilder()
+				.append(_id, rhs._id)
+				.append(_concertId, rhs._concertId)
 				.append(_concertTitle, rhs._concertTitle)
 				.append(_dateTime, rhs._dateTime)
 				.append(_seats, rhs._seats)
