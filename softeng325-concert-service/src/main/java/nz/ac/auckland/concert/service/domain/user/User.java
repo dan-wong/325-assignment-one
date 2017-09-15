@@ -3,10 +3,15 @@ package nz.ac.auckland.concert.service.domain.user;
 import nz.ac.auckland.concert.service.domain.concert.Booking;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Set;
 
 @Entity
 @Table(name = "USER")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class User {
 	@Id
 	@GeneratedValue

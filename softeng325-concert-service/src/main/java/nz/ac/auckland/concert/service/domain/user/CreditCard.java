@@ -7,10 +7,15 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 
 @Embeddable
 @Table(name = "CREDIT_CARD")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CreditCard {
 	@Enumerated
 	@Column(name = "TYPE", nullable = false)

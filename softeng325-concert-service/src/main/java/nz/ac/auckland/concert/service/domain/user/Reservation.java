@@ -5,10 +5,15 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESERVATION")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Reservation {
 	@Id
 	@GeneratedValue
