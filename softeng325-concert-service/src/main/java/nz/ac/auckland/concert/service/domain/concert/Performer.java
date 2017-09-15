@@ -34,7 +34,7 @@ public class Performer {
 	@Enumerated
 	private Genre _genre;
 
-	@ManyToMany(mappedBy = "concerts")
+	@ManyToMany(mappedBy = "_performers")
 	private Set<Concert> _concerts;
 
 	public Performer(Long id, String name, String s3ImageUri, Genre genre) {

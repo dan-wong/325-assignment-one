@@ -1,7 +1,6 @@
 package nz.ac.auckland.concert.service.domain.concert;
 
 import nz.ac.auckland.concert.common.types.PriceBand;
-import nz.ac.auckland.concert.service.domain.jpa.LocalDateTimeConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -10,7 +9,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +21,7 @@ import java.util.Set;
  * based on their title value.
  */
 @Entity
-@Table(name = "CONCERT")
+@Table(name = "CONCERTS")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Concert implements Comparable<Concert> {
@@ -35,16 +33,14 @@ public class Concert implements Comparable<Concert> {
 	private String _title;
 
 	@ElementCollection
-	@CollectionTable(name = "CONCERT_DATES")
-	@Convert(converter = LocalDateTimeConverter.class)
-	private Set<LocalDateTime> _dates;
+	private Set<ConcertDates> _dates;
 
 	@ElementCollection
-	@CollectionTable(name = "CONCERT_TARIFS	")
+	@CollectionTable(name = "CONCERT_TARIFS")
 	private Map<PriceBand, BigDecimal> _tariff;
 
 	@ManyToMany
-	@JoinTable(name = "CONCERT_PERFORMERS")
+	@JoinTable(name = "CONCERT_PERFORMER")
 	private Set<Performer> _performers;
 
 	// Required for JPA and JAXB.
@@ -65,14 +61,6 @@ public class Concert implements Comparable<Concert> {
 
 	public void setTitle(String title) {
 		_title = title;
-	}
-
-	public Set<LocalDateTime> getDates() {
-		return _dates;
-	}
-
-	public void setDates(Set<LocalDateTime> dates) {
-		_dates = dates;
 	}
 
 	public Map<PriceBand, BigDecimal> getTariff() {
@@ -101,7 +89,6 @@ public class Concert implements Comparable<Concert> {
 		Concert rhs = (Concert) obj;
 		return new EqualsBuilder().
 				append(_title, rhs.getTitle()).
-				append(_dates, rhs.getDates()).
 				isEquals();
 	}
 
