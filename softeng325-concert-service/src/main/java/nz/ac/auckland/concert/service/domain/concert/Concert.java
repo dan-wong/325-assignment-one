@@ -40,12 +40,11 @@ public class Concert implements Comparable<Concert> {
 	private Set<LocalDateTime> _dates;
 
 	@ElementCollection
-	@CollectionTable(name = "CONCERT_TARIFS")
+	@CollectionTable(name = "CONCERT_TARIFS	")
 	private Map<PriceBand, BigDecimal> _tariff;
 
-	@ElementCollection
-	@CollectionTable(name = "CONCERT_PERFORMER")
-	@JoinColumn(name = "id", nullable = false)
+	@ManyToMany
+	@JoinTable(name = "CONCERT_PERFORMERS")
 	private Set<Performer> _performers;
 
 	// Required for JPA and JAXB.

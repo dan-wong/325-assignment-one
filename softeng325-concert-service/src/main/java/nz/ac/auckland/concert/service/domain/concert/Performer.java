@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Set;
 
 /**
  * Class to represent a Performer (an artist or band that plays at Concerts). A
@@ -32,6 +33,9 @@ public class Performer {
 	@Column(name = "GENRE", nullable = false)
 	@Enumerated
 	private Genre _genre;
+
+	@ManyToMany(mappedBy = "concerts")
+	private Set<Concert> _concerts;
 
 	public Performer(Long id, String name, String s3ImageUri, Genre genre) {
 		_id = id;

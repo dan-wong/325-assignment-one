@@ -10,6 +10,7 @@ import java.util.Set;
 public class User {
 	@Id
 	@GeneratedValue
+	@Column(name = "id")
 	private Long _id;
 
 	@Column(name = "USERNAME", nullable = false)
@@ -25,6 +26,8 @@ public class User {
 	private String _lastName;
 
 	@ElementCollection
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "id", nullable = false)
 	private Set<Booking> _bookings;
 
 	@Embedded
