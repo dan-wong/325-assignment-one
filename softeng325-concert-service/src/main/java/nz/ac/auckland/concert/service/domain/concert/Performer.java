@@ -23,13 +23,13 @@ public class Performer {
 	@GeneratedValue
 	private Long _id;
 
-	@Column(nullable = false)
+	@Column(name = "NAME", nullable = false)
 	private String _name;
 
-	@Column(nullable = false)
+	@Column(name = "IMAGE", nullable = false)
 	private String _s3ImageUri;
 
-	@Column(nullable = false)
+	@Column(name = "GENRE", nullable = false)
 	@Enumerated
 	private Genre _genre;
 

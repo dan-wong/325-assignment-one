@@ -31,7 +31,7 @@ public class Concert implements Comparable<Concert> {
 	@GeneratedValue
 	private Long _id;
 
-	@Column(nullable = false)
+	@Column(name = "TITLE", nullable = false)
 	private String _title;
 
 	@ElementCollection

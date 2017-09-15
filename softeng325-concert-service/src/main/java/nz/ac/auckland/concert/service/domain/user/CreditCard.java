@@ -5,18 +5,23 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.time.LocalDate;
 
 @Embeddable
 @Table(name = "CREDIT_CARD")
 public class CreditCard {
+	@Enumerated
 	@Column(name = "TYPE", nullable = false)
 	private CreditCard.Type _type;
+
 	@Column(name = "NAME", nullable = false)
 	private String _name;
+
 	@Column(name = "NUMBER", nullable = false)
 	private String _number;
+
 	@Column(name = "EXPIRY_DATE", nullable = false)
 	private LocalDate _expiryDate;
 
