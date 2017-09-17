@@ -25,8 +25,6 @@
 		<!-- Specify each class to map using a class element -->
 		<class>nz.ac.auckland.concert.service.domain.concert.Booking</class>
         <class>nz.ac.auckland.concert.service.domain.concert.Concert</class>
-        <class>nz.ac.auckland.concert.service.domain.concert.ConcertDates</class>
-		<class>nz.ac.auckland.concert.service.domain.concert.ConcertTariffs</class>
         <class>nz.ac.auckland.concert.service.domain.concert.Performer</class>
 		<class>nz.ac.auckland.concert.service.domain.concert.Seat</class>
 		<class>nz.ac.auckland.concert.service.domain.user.CreditCard</class>
