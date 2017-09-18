@@ -3,6 +3,11 @@ package nz.ac.auckland.concert.common.dto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * DTO class to represent users. 
  * 
@@ -13,11 +18,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * _lastname  the user's family name.
  *
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class UserDTO {
-
+	@XmlElement(name = "username")
 	private String _username;
+
+	@XmlElement(name = "password")
 	private String _password;
+
+	@XmlElement(name = "first-name")
 	private String _firstname;
+
+	@XmlElement(name = "last-name")
 	private String _lastname;
 	
 	protected UserDTO() {}

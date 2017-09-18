@@ -1,9 +1,13 @@
 package nz.ac.auckland.concert.common.dto;
 
-import java.time.LocalDate;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.time.LocalDate;
 
 /**
  * DTO class to represent credit cards. 
@@ -15,14 +19,20 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * _expiryDate the credit card's expiry date. 
  *
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CreditCardDTO {
-	
-	public enum Type {Visa, Master};
-	
+
+	@XmlElement(name = "type")
 	private Type _type;
+	@XmlElement(name = "name")
 	private String _name;
+	@XmlElement(name = "number")
 	private String _number;
+	@XmlElement(name = "expiry-date")
 	private LocalDate _expiryDate;
+
+	public enum Type {Visa, Master}
 	
 	public CreditCardDTO() {}
 	

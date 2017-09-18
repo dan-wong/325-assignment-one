@@ -1,13 +1,13 @@
 package nz.ac.auckland.concert.common.dto;
 
+import nz.ac.auckland.concert.common.types.Genre;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.xml.bind.annotation.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import nz.ac.auckland.concert.common.types.Genre;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * DTO class to represent performers. 
@@ -21,13 +21,23 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *             playing. 
  *             
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PerformerDTO {
-
+	@XmlID
+	@XmlAttribute(name = "id")
 	private Long _id;
+
+	@XmlElement(name = "name")
 	private String _name;
+
+	@XmlElement(name = "image-name")
 	private String _imageName;
+
+	@XmlElement(name = "genre")
 	private Genre _genre;
-	
+
+	@XmlElement(name = "concert-id")
 	private Set<Long> _concertIds;
 	
 	public PerformerDTO() {}

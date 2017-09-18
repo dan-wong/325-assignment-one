@@ -1,9 +1,10 @@
 package nz.ac.auckland.concert.common.dto;
 
-import java.time.LocalDateTime;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.xml.bind.annotation.*;
+import java.time.LocalDateTime;
 
 /**
  * DTO class to represent news items. A news item typically reports that a
@@ -16,10 +17,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * _content   the news item context text.   
  *
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NewsItemDTO {
-
+	@XmlID
+	@XmlAttribute(name = "id")
 	private Long _id;
+
+	@XmlElement(name = "timestamp")
 	private LocalDateTime _timestamp;
+
+	@XmlElement(name = "content")
 	private String _content;
 	
 	public NewsItemDTO() {}
