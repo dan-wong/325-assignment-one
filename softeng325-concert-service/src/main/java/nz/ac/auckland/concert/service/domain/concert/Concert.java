@@ -49,30 +49,6 @@ public class Concert implements Comparable<Concert> {
 	protected Concert() {
 	}
 
-	public Long getId() {
-		return _id;
-	}
-
-	public void setId(Long id) {
-		_id = id;
-	}
-
-	public String getTitle() {
-		return _title;
-	}
-
-	public void setTitle(String title) {
-		_title = title;
-	}
-
-	public Set<Performer> getPerformers() {
-		return _performers;
-	}
-
-	public void setPerformers(Set<Performer> performers) {
-		_performers = performers;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Concert))
@@ -82,7 +58,7 @@ public class Concert implements Comparable<Concert> {
 
 		Concert rhs = (Concert) obj;
 		return new EqualsBuilder().
-				append(_title, rhs.getTitle()).
+				append(_title, rhs._title).
 				isEquals();
 	}
 
@@ -94,6 +70,6 @@ public class Concert implements Comparable<Concert> {
 
 	@Override
 	public int compareTo(Concert concert) {
-		return _title.compareTo(concert.getTitle());
+		return _title.compareTo(concert._title);
 	}
 }

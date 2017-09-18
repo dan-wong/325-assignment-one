@@ -6,10 +6,7 @@ import nz.ac.auckland.concert.service.domain.jpa.SeatNumberConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -26,8 +23,7 @@ public class SeatKey implements Serializable {
 	@Convert(converter = SeatNumberConverter.class)
 	private SeatNumber _number;
 
-	@ManyToOne
-	@Column(name = "CONCERT", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Concert _concert;
 
 	@Column(name = "DATE", nullable = false)
