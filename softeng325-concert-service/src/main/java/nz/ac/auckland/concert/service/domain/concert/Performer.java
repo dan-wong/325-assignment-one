@@ -5,9 +5,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Set;
 
 /**
@@ -17,8 +14,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "PERFORMERS")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Performer {
 	@Id
 	@GeneratedValue

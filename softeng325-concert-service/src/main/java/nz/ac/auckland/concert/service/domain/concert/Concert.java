@@ -6,9 +6,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -24,8 +21,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "CONCERTS")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Concert implements Comparable<Concert> {
 	@Id
 	@GeneratedValue
