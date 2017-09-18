@@ -49,6 +49,34 @@ public class Concert implements Comparable<Concert> {
 	protected Concert() {
 	}
 
+	public Concert(Long id, String title, Set<LocalDateTime> dates, Map<PriceBand, BigDecimal> priceTariffs, Set<Performer> performers) {
+		_id = id;
+		_title = title;
+		_dates = dates;
+		_priceTariffs = priceTariffs;
+		_performers = performers;
+	}
+
+	public Long getId() {
+		return _id;
+	}
+
+	public String getTitle() {
+		return _title;
+	}
+
+	public Set<LocalDateTime> getDates() {
+		return _dates;
+	}
+
+	public Map<PriceBand, BigDecimal> getPriceTariffs() {
+		return _priceTariffs;
+	}
+
+	public Set<Performer> getPerformers() {
+		return _performers;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Concert))
