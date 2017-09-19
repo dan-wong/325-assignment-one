@@ -36,7 +36,7 @@ public class Concert implements Comparable<Concert> {
 	private Set<LocalDateTime> _dates;
 
 	@ElementCollection
-	@CollectionTable(name = "CONCERT_TARIFS", joinColumns = @JoinColumn(name = "CONCERT_TARIFF_ID"))
+	@CollectionTable(name = "CONCERT_TARIFFS", joinColumns = @JoinColumn(name = "CONCERT_TARIFF_ID"))
 	@MapKeyEnumerated(EnumType.STRING)
 	@Column(name = "TARIFFS", nullable = false)
 	private Map<PriceBand, BigDecimal> _priceTariffs;

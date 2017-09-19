@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -32,11 +33,16 @@ public class Performer {
 	@ManyToMany(mappedBy = "_performers")
 	private Set<Concert> _concerts;
 
-	public Performer(Long id, String name, String s3ImageUri, Genre genre) {
+	public Performer(Long id, String name, String s3ImageUri, Genre genre, Set<Concert> concerts) {
 		_id = id;
 		_name = name;
 		_s3ImageUri = s3ImageUri;
 		_genre = genre;
+		_concerts = concerts;
+	}
+
+	public Performer(Long id, String name, String s3ImageUri, Genre genre) {
+		this(id, name, s3ImageUri, genre, null);
 	}
 
 	public Performer(String name, String s3ImageUri, Genre genre) {
@@ -77,6 +83,10 @@ public class Performer {
 
 	public void setGenre(Genre genre) {
 		_genre = genre;
+	}
+
+	public Set<Concert> getConcerts() {
+		return Collections.unmodifiableSet(_concerts);
 	}
 
 	@Override

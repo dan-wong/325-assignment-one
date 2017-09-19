@@ -65,7 +65,11 @@ public class PerformerDTO {
 	public Set<Long> getConcertIds() {
 		return Collections.unmodifiableSet(_concertIds);
 	}
-	
+
+	public Genre getGenre() {
+		return _genre;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof PerformerDTO))
