@@ -31,6 +31,14 @@ public class Booking {
 	protected Booking() {
 	}
 
+	public Booking(Long id, Concert concert, LocalDateTime localDateTime, Set<Seat> seats, PriceBand priceBand) {
+		_id = id;
+		_concert = concert;
+		_dateTime = localDateTime;
+		_seats = seats;
+		_priceBand = priceBand;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Booking))

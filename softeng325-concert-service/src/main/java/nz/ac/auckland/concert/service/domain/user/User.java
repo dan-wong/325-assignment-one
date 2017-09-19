@@ -25,7 +25,6 @@ public class User {
 	@Column(name = "LAST_NAME", nullable = false)
 	private String _lastName;
 
-	@ElementCollection
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "id", nullable = false)
 	private Set<Booking> _bookings;

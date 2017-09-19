@@ -22,7 +22,7 @@ public class ConcertResource {
 	 * whether the specified Concert is found.
 	 *
 	 * @param id
-	 * @return
+	 * @return the concert corresponding to the id
 	 */
 	@GET
 	@Path("{id}")
@@ -37,6 +37,31 @@ public class ConcertResource {
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		} else {
 			rb.entity(concert);
+			rb.status(200);
+		}
+
+		_em.close();
+		return rb.build();
+	}
+
+	/**
+	 * Returns a Response containing all the concerts in the CONCERTS table
+	 *
+	 * @return a list of all the concerts
+	 */
+	@GET
+	public Response getAllConcerts() {
+		_em.getTransaction().begin();
+
+		TypedQuery<Concert> concertQuery =
+				_em.createQuery("SELECT c FROM CONCERTS c", Concert.class);
+		List<Concert> concerts = concertQuery.getResultList();
+
+		Response.ResponseBuilder rb = new ResponseBuilderImpl();
+		if (concerts == null) {
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		} else {
+			rb.entity(concerts);
 			rb.status(200);
 		}
 
