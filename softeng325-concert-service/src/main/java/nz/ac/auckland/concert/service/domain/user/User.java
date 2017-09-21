@@ -4,6 +4,7 @@ import nz.ac.auckland.concert.service.domain.concert.Booking;
 
 import javax.persistence.*;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "USER")
@@ -29,8 +30,10 @@ public class User {
 	@JoinColumn(name = "id", nullable = false)
 	private Set<Booking> _bookings;
 
-	@Column(name = "CREDIT_CARD")
-	private CreditCard _creditCard;
+	@OneToMany(cascade = CascadeType.ALL)
+	private Set<CreditCard> _creditCards;
+
+	private UUID _uuid;
 
 	protected User() {
 	}
@@ -66,7 +69,15 @@ public class User {
 		return _bookings;
 	}
 
-//	public CreditCard getCreditCard() {
-//		return _creditCard;
-//	}
+	public Set<CreditCard> getCreditCards() {
+		return _creditCards;
+	}
+
+	public UUID getUUID() {
+		return _uuid;
+	}
+
+	public void setUUID(UUID uuid) {
+		_uuid = uuid;
+	}
 }

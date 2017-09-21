@@ -16,8 +16,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Path("/concerts")
@@ -118,12 +120,20 @@ public class ConcertResource {
 
 		user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getFirstname(), userDTO.getLastname());
 
+		//Generate a random UUID and set the User field to that value
+		UUID uuid = UUID.randomUUID();
+		user.setUUID(uuid);
+
+		//Create a new cookie with the UUID
+		NewCookie cookie = makeCookie(uuid);
+
 		_em.getTransaction().begin();
 		_em.persist(user);
 		_em.getTransaction().commit();
 
 		Response.ResponseBuilder rb = new ResponseBuilderImpl();
 		rb.entity(userDTO);
+		rb.cookie(cookie);
 		rb.status(201);
 
 		_em.close();
@@ -153,6 +163,7 @@ public class ConcertResource {
 
 		Response.ResponseBuilder rb = new ResponseBuilderImpl();
 		rb.entity(UserMapper.convertToDTO(user));
+		rb.cookie(makeCookie(user.getUUID()));
 		rb.status(200);
 
 		return rb.build();
@@ -181,5 +192,9 @@ public class ConcertResource {
 
 		_em.close();
 		return rb.build();
+	}
+
+	private NewCookie makeCookie(UUID uuid) {
+		return new NewCookie("UUID", uuid.toString());
 	}
 }
