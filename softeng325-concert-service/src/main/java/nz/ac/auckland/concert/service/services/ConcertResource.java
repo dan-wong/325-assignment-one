@@ -1,13 +1,16 @@
 package nz.ac.auckland.concert.service.services;
 
 import nz.ac.auckland.concert.common.dto.ConcertDTO;
+import nz.ac.auckland.concert.common.dto.CreditCardDTO;
 import nz.ac.auckland.concert.common.dto.PerformerDTO;
 import nz.ac.auckland.concert.common.dto.UserDTO;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
+import nz.ac.auckland.concert.service.domain.user.CreditCard;
 import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.ConcertMapper;
+import nz.ac.auckland.concert.service.mappers.CreditCardMapper;
 import nz.ac.auckland.concert.service.mappers.PerformerMapper;
 import nz.ac.auckland.concert.service.mappers.UserMapper;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
@@ -166,6 +169,33 @@ public class ConcertResource {
 		rb.cookie(makeCookie(user.getUUID()));
 		rb.status(200);
 
+		return rb.build();
+	}
+
+	@POST
+	@Path("/user")
+	public Response registerCreditCard(CreditCardDTO creditCardDTO) {
+		CreditCard creditCard = CreditCardMapper.convertToDTO(creditCardDTO);
+
+		user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getFirstname(), userDTO.getLastname());
+
+		//Generate a random UUID and set the User field to that value
+		UUID uuid = UUID.randomUUID();
+		user.setUUID(uuid);
+
+		//Create a new cookie with the UUID
+		NewCookie cookie = makeCookie(uuid);
+
+		_em.getTransaction().begin();
+		_em.persist(user);
+		_em.getTransaction().commit();
+
+		Response.ResponseBuilder rb = new ResponseBuilderImpl();
+		rb.entity(userDTO);
+		rb.cookie(cookie);
+		rb.status(201);
+
+		_em.close();
 		return rb.build();
 	}
 
