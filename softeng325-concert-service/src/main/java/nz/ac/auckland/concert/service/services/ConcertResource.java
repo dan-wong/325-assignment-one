@@ -207,31 +207,6 @@ public class ConcertResource {
 		return rb.build();
 	}
 
-	/**
-	 * Deletes all Concerts, and returns a 204 status code.
-	 *
-	 * @return
-	 */
-	@DELETE
-	public Response deleteAllConcerts() {
-		// Start a new transaction.
-		_em.getTransaction().begin();
-
-		TypedQuery<Concert> concertQuery =
-				_em.createQuery("select c from Concert c", Concert.class);
-		List<Concert> concerts = concertQuery.getResultList();
-
-		for (Concert concert : concerts) {
-			_em.remove(concert);
-		}
-
-		Response.ResponseBuilder rb = new ResponseBuilderImpl();
-		rb.status(204);
-
-		_em.close();
-		return rb.build();
-	}
-
 	private NewCookie makeCookie(UUID uuid) {
 		return new NewCookie("UUID", uuid.toString());
 	}
