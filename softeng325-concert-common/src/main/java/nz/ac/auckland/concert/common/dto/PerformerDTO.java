@@ -4,7 +4,9 @@ import nz.ac.auckland.concert.common.types.Genre;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,20 +26,14 @@ import java.util.Set;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PerformerDTO {
-	@XmlID
-	@XmlAttribute(name = "id")
 	private Long _id;
 
-	@XmlElement(name = "name")
 	private String _name;
 
-	@XmlElement(name = "image-name")
 	private String _imageName;
 
-	@XmlElement(name = "genre")
 	private Genre _genre;
 
-	@XmlElement(name = "concert-id")
 	private Set<Long> _concertIds;
 	
 	public PerformerDTO() {}

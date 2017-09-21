@@ -3,7 +3,9 @@ package nz.ac.auckland.concert.common.dto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,14 +26,10 @@ import java.util.Set;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ReservationDTO {
-	@XmlID
-	@XmlAttribute(name = "id")
 	private Long _id;
 
-	@XmlElement(name = "request")
 	private ReservationRequestDTO _request;
 
-	@XmlElement(name = "seats")
 	private Set<SeatDTO> _seats;
 	
 	public ReservationDTO() {}

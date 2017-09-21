@@ -3,7 +3,9 @@ package nz.ac.auckland.concert.common.dto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
 
 /**
@@ -20,14 +22,10 @@ import java.time.LocalDateTime;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NewsItemDTO {
-	@XmlID
-	@XmlAttribute(name = "id")
 	private Long _id;
 
-	@XmlElement(name = "timestamp")
 	private LocalDateTime _timestamp;
 
-	@XmlElement(name = "content")
 	private String _content;
 	
 	public NewsItemDTO() {}

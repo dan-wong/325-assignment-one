@@ -5,7 +5,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 
@@ -22,14 +21,12 @@ import java.time.LocalDate;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CreditCardDTO {
-
-	@XmlElement(name = "type")
 	private Type _type;
-	@XmlElement(name = "name")
+
 	private String _name;
-	@XmlElement(name = "number")
+
 	private String _number;
-	@XmlElement(name = "expiry-date")
+
 	private LocalDate _expiryDate;
 
 	public enum Type {Visa, Master}

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
 
@@ -24,16 +23,12 @@ import java.time.LocalDateTime;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ReservationRequestDTO {
-	@XmlElement(name = "number-of-seats")
 	private int _numberOfSeats;
 
-	@XmlElement(name = "seat-type")
 	private PriceBand _seatType;
 
-	@XmlElement(name = "concert-id")
 	private Long _concertId;
 
-	@XmlElement(name = "date")
 	private LocalDateTime _date;
 	
 	public ReservationRequestDTO() {}
