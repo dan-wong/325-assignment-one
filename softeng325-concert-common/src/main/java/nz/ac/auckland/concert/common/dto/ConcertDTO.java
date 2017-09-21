@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.common.dto;
 
+import nz.ac.auckland.concert.common.jaxb.LocalDateTimeAdapter;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,6 +34,7 @@ public class ConcertDTO {
 
 	private String _title;
 
+	@XmlJavaTypeAdapter(type = LocalDateTime.class, value = LocalDateTimeAdapter.class)
 	private Set<LocalDateTime> _dates;
 
 	private Map<PriceBand, BigDecimal> _tariff;

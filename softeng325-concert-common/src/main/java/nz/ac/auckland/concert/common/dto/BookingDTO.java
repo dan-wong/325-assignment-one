@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.common.dto;
 
+import nz.ac.auckland.concert.common.jaxb.LocalDateTimeAdapter;
 import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,6 +35,7 @@ public class BookingDTO {
 
 	private String _concertTitle;
 
+	@XmlJavaTypeAdapter(type = LocalDateTime.class, value = LocalDateTimeAdapter.class)
 	private LocalDateTime _dateTime;
 
 	private Set<SeatDTO> _seats;
