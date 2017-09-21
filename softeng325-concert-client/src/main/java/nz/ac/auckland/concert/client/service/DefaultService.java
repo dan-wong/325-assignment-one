@@ -195,11 +195,11 @@ public class DefaultService implements ConcertService {
 		try {
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
-			Builder builder = client.target(WEB_SERVICE_URI + "/user/" + user.getUsername()).request();
+			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
 
 			// Make the service invocation via a HTTP GET message, and wait for
 			// the response.
-			response = builder.get();
+			response = builder.post(Entity.entity(creditCard, javax.ws.rs.core.MediaType.APPLICATION_XML));
 
 			// Check that the HTTP response code is 201 OK.
 			int responseCode = response.getStatus();

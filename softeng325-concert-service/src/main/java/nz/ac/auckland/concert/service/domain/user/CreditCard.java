@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.service.domain.user;
 
+import nz.ac.auckland.concert.common.dto.CreditCardDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -15,7 +16,7 @@ public class CreditCard {
 
 	@Enumerated
 	@Column(name = "TYPE", nullable = false)
-	private CreditCard.Type _type;
+	private CreditCardDTO.Type _type;
 
 	@Column(name = "NAME", nullable = false)
 	private String _name;
@@ -29,14 +30,14 @@ public class CreditCard {
 	public CreditCard() {
 	}
 
-	public CreditCard(CreditCard.Type type, String name, String number, LocalDate expiryDate) {
+	public CreditCard(CreditCardDTO.Type type, String name, String number, LocalDate expiryDate) {
 		_type = type;
 		_name = name;
 		_number = number;
 		_expiryDate = expiryDate;
 	}
 
-	public CreditCard.Type getType() {
+	public CreditCardDTO.Type getType() {
 		return _type;
 	}
 
@@ -77,6 +78,4 @@ public class CreditCard {
 				append(_expiryDate).
 				hashCode();
 	}
-
-	public enum Type {Visa, Master}
 }
