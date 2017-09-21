@@ -91,12 +91,6 @@ public class DefaultService implements ConcertService {
 		Response response = null;
 		Client client = ClientBuilder.newClient();
 
-		//Check all fields are filled
-		if (newUser.getFirstname() == null || newUser.getLastname() == null ||
-				newUser.getPassword() == null || newUser.getUsername() == null) {
-			throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
-		}
-
 		try {
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
@@ -109,12 +103,18 @@ public class DefaultService implements ConcertService {
 			// Check that the HTTP response code is 201 OK.
 			int responseCode = response.getStatus();
 
-			if (responseCode == 201) {
-				UserDTO user = response.readEntity(UserDTO.class);
-
-				return user;
-			} else {
-				throw new ServiceException(responseCode + "");
+			switch (responseCode) {
+				case 201:
+					return response.readEntity(UserDTO.class);
+				case 400:
+					String message = response.readEntity(String.class);
+					if (message.equals(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME)) {
+						throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
+					} else {
+						throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
+					}
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
 			// Close the Response object.

@@ -10,7 +10,6 @@ import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.ConcertMapper;
 import nz.ac.auckland.concert.service.mappers.PerformerMapper;
 import nz.ac.auckland.concert.service.mappers.UserMapper;
-import org.hibernate.service.spi.ServiceException;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
@@ -150,8 +149,22 @@ public class ConcertResource {
 		User user = UserMapper.convertToModel(userDTO);
 
 		//If the conversion returns a User object, that means the username is taken
+		//Throw an exception
 		if (user != null) {
-			throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
+			throw new BadRequestException(Response
+					.status(Response.Status.BAD_REQUEST)
+					.entity(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME)
+					.build());
+		}
+
+		//Check all fields are filled
+		//If not throw an exception
+		if (userDTO.getFirstname() == null || userDTO.getLastname() == null ||
+				userDTO.getPassword() == null || userDTO.getUsername() == null) {
+			throw new BadRequestException(Response
+					.status(Response.Status.BAD_REQUEST)
+					.entity(Messages.CREATE_USER_WITH_MISSING_FIELDS)
+					.build());
 		}
 
 		user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getFirstname(), userDTO.getLastname());
