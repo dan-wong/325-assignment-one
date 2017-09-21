@@ -1,28 +1,96 @@
 package nz.ac.auckland.concert.client.service;
 
-import java.awt.Image;
-import java.util.Set;
+import nz.ac.auckland.concert.common.dto.*;
+import nz.ac.auckland.concert.service.domain.concert.Performer;
+import nz.ac.auckland.concert.service.mappers.PerformerMapper;
 
-import nz.ac.auckland.concert.common.dto.BookingDTO;
-import nz.ac.auckland.concert.common.dto.ConcertDTO;
-import nz.ac.auckland.concert.common.dto.CreditCardDTO;
-import nz.ac.auckland.concert.common.dto.PerformerDTO;
-import nz.ac.auckland.concert.common.dto.ReservationDTO;
-import nz.ac.auckland.concert.common.dto.ReservationRequestDTO;
-import nz.ac.auckland.concert.common.dto.UserDTO;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DefaultService implements ConcertService {
+	private static String WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
+	private static Client _client = ClientBuilder.newClient();
 
 	@Override
 	public Set<ConcertDTO> getConcerts() throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		Response response = null;
+
+		try {
+			// Make an invocation on a Concert URI and specify Java-
+			// serialization as the required data format.
+			Builder builder = _client.target(WEB_SERVICE_URI).request();
+
+			// Make the service invocation via a HTTP GET message, and wait for
+			// the response.
+			response = builder.get();
+
+			// Check that the HTTP response code is 200 OK.
+			int responseCode = response.getStatus();
+
+			if (responseCode == 200) {
+				// Retrieve the list of concerts
+				ArrayList<ConcertDTO> concerts = response
+						.readEntity(new GenericType<ArrayList<ConcertDTO>>() {
+						});
+
+				return new HashSet<>(concerts);
+			} else {
+				throw new ServiceException(responseCode + "");
+			}
+		} catch (ServiceException e) {
+			throw new ServiceException(e.getMessage());
+		} finally {
+			// Close the Response object.
+			response.close();
+		}
 	}
 
 	@Override
 	public Set<PerformerDTO> getPerformers() throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		Response response = null;
+
+		try {
+			// Make an invocation on a Concert URI and specify Java-
+			// serialization as the required data format.
+			Builder builder = _client.target(WEB_SERVICE_URI + "/performers").request()
+					.accept("application/java-serialization");
+
+			// Make the service invocation via a HTTP GET message, and wait for
+			// the response.
+			response = builder.get();
+
+			// Check that the HTTP response code is 200 OK.
+			int responseCode = response.getStatus();
+
+			if (responseCode == 200) {
+				response = builder.get();
+
+				// Retrieve the list of concerts
+				List<Performer> performers = response
+						.readEntity(new GenericType<List<Performer>>() {
+						});
+
+				return performers.stream()
+						.map(PerformerMapper::convertToDTO)
+						.collect(Collectors.toSet());
+			} else {
+				throw new ServiceException(responseCode + "");
+			}
+		} catch (ServiceException e) {
+			throw new ServiceException(e.getMessage());
+		} finally {
+			// Close the Response object.
+			response.close();
+		}
 	}
 
 	@Override

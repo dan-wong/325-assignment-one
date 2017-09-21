@@ -1,14 +1,19 @@
 package nz.ac.auckland.concert.service.services;
 
+import nz.ac.auckland.concert.common.dto.ConcertDTO;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
+import nz.ac.auckland.concert.service.domain.concert.Performer;
+import nz.ac.auckland.concert.service.mappers.ConcertMapper;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/concerts")
 @Produces(javax.ws.rs.core.MediaType.APPLICATION_XML)
@@ -54,14 +59,47 @@ public class ConcertResource {
 		_em.getTransaction().begin();
 
 		TypedQuery<Concert> concertQuery =
-				_em.createQuery("SELECT c FROM CONCERTS c", Concert.class);
+				_em.createQuery("select c from Concert c", Concert.class);
 		List<Concert> concerts = concertQuery.getResultList();
 
 		Response.ResponseBuilder rb = new ResponseBuilderImpl();
 		if (concerts == null) {
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		} else {
-			rb.entity(concerts);
+			List<ConcertDTO> concertDTOS = concerts.stream()
+					.map(ConcertMapper::convertToDTO)
+					.collect(Collectors.toList());
+
+			GenericEntity<List<ConcertDTO>> genericEntity = new GenericEntity<List<ConcertDTO>>(concertDTOS) {
+			};
+
+			rb.entity(genericEntity);
+			rb.status(200);
+		}
+
+		_em.close();
+		return rb.build();
+	}
+
+	/**
+	 * Returns a Response containing all the performers in the PERFORMERS table
+	 *
+	 * @return a list of all the concerts
+	 */
+	@GET
+	@Path("/performers")
+	public Response getAllPerformers() {
+		_em.getTransaction().begin();
+
+		TypedQuery<Performer> performerQuery =
+				_em.createQuery("SELECT p FROM PERFORMERS p", Performer.class);
+		List<Performer> performers = performerQuery.getResultList();
+
+		Response.ResponseBuilder rb = new ResponseBuilderImpl();
+		if (performers == null) {
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		} else {
+			rb.entity(performers);
 			rb.status(200);
 		}
 

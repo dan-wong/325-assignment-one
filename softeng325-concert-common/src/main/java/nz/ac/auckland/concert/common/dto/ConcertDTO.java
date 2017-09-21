@@ -4,7 +4,9 @@ import nz.ac.auckland.concert.common.types.PriceBand;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,23 +25,17 @@ import java.util.*;
  *               (represented as a set of performer identifiers).
  *
  */
-@XmlRootElement
+@XmlRootElement(name = "concert")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConcertDTO {
-	@XmlID
-	@XmlAttribute(name = "id")
 	private Long _id;
 
-	@XmlElement(name = "title")
 	private String _title;
 
-	@XmlElement(name = "dates")
 	private Set<LocalDateTime> _dates;
 
-	@XmlElement(name = "tariff")
 	private Map<PriceBand, BigDecimal> _tariff;
 
-	@XmlElement(name = "performers")
 	private Set<Long> _performerIds;
 
 	public ConcertDTO() {
