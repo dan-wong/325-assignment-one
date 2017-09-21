@@ -29,9 +29,8 @@ public class User {
 	@JoinColumn(name = "id", nullable = false)
 	private Set<Booking> _bookings;
 
-//	@Embedded
-//	@Column(name = "CREDIT_CARD")
-//	private CreditCard _creditCard;
+	@Column(name = "CREDIT_CARD")
+	private CreditCard _creditCard;
 
 	protected User() {
 	}

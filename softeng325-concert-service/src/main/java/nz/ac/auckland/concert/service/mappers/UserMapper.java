@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserMapper {
 	public static UserDTO convertToDTO(User user) {
-		return new UserDTO(user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName());
+		return new UserDTO(user.getUsername(), user.getPassword(), user.getLastName(), user.getFirstName());
 	}
 
 	public static User convertToModel(UserDTO userDTO) {

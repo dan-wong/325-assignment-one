@@ -3,15 +3,16 @@ package nz.ac.auckland.concert.service.domain.user;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 
-@Embeddable
+@Entity
 @Table(name = "CREDIT_CARD")
 public class CreditCard {
+	@Id
+	@GeneratedValue
+	private Long _id;
+
 	@Enumerated
 	@Column(name = "TYPE", nullable = false)
 	private CreditCard.Type _type;

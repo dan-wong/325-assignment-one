@@ -35,15 +35,16 @@ public class DefaultService implements ConcertService {
 			// Check that the HTTP response code is 200 OK.
 			int responseCode = response.getStatus();
 
-			if (responseCode == 200) {
-				// Retrieve the list of concerts
-				ArrayList<ConcertDTO> concerts = response
-						.readEntity(new GenericType<ArrayList<ConcertDTO>>() {
-						});
+			switch (responseCode) {
+				case 200:
+					// Retrieve the list of concerts
+					ArrayList<ConcertDTO> concerts = response
+							.readEntity(new GenericType<ArrayList<ConcertDTO>>() {
+							});
 
-				return new HashSet<>(concerts);
-			} else {
-				throw new ServiceException(responseCode + "");
+					return new HashSet<>(concerts);
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
 			// Close the Response object.
@@ -69,15 +70,15 @@ public class DefaultService implements ConcertService {
 			// Check that the HTTP response code is 200 OK.
 			int responseCode = response.getStatus();
 
-			if (responseCode == 200) {
-				// Retrieve the list of concerts
-				List<PerformerDTO> performers = response
-						.readEntity(new GenericType<List<PerformerDTO>>() {
-						});
+			switch (responseCode) {
+				case 200:
+					// Retrieve the list of concerts
+					List<PerformerDTO> performers = response.readEntity(new GenericType<List<PerformerDTO>>() {
+					});
 
-				return new HashSet<>(performers);
-			} else {
-				throw new ServiceException(responseCode + "");
+					return new HashSet<>(performers);
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
 			// Close the Response object.
@@ -125,8 +126,47 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public UserDTO authenticateUser(UserDTO user) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		Response response = null;
+		Client client = ClientBuilder.newClient();
+
+		if (user.getUsername() == null || user.getPassword() == null) {
+			throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
+		}
+
+		try {
+			// Make an invocation on a Concert URI and specify Java-
+			// serialization as the required data format.
+			Builder builder = client.target(WEB_SERVICE_URI + "/user/" + user.getUsername()).request();
+
+			// Make the service invocation via a HTTP GET message, and wait for
+			// the response.
+			response = builder.get();
+
+			// Check that the HTTP response code is 201 OK.
+			int responseCode = response.getStatus();
+
+			switch (responseCode) {
+				case 200:
+					UserDTO retrievedUser = response.readEntity(UserDTO.class);
+
+					if (retrievedUser.getUsername().equals(user.getUsername()) && retrievedUser.getPassword().equals(user.getPassword())) {
+						return retrievedUser;
+					} else {
+						throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
+					}
+				case 400:
+					String message = response.readEntity(String.class);
+					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
+						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
+					}
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+			}
+		} finally {
+			// Close the Response object.
+			response.close();
+			client.close();
+		}
 	}
 
 	@Override
