@@ -1,8 +1,6 @@
 package nz.ac.auckland.concert.client.service;
 
 import nz.ac.auckland.concert.common.dto.*;
-import nz.ac.auckland.concert.service.domain.concert.Performer;
-import nz.ac.auckland.concert.service.mappers.PerformerMapper;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -14,20 +12,19 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DefaultService implements ConcertService {
 	private static String WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
-	private static Client _client = ClientBuilder.newClient();
 
 	@Override
 	public Set<ConcertDTO> getConcerts() throws ServiceException {
 		Response response = null;
+		Client client = ClientBuilder.newClient();
 
 		try {
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
-			Builder builder = _client.target(WEB_SERVICE_URI).request();
+			Builder builder = client.target(WEB_SERVICE_URI).request();
 
 			// Make the service invocation via a HTTP GET message, and wait for
 			// the response.
@@ -51,18 +48,19 @@ public class DefaultService implements ConcertService {
 		} finally {
 			// Close the Response object.
 			response.close();
+			client.close();
 		}
 	}
 
 	@Override
 	public Set<PerformerDTO> getPerformers() throws ServiceException {
 		Response response = null;
+		Client client = ClientBuilder.newClient();
 
 		try {
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
-			Builder builder = _client.target(WEB_SERVICE_URI + "/performers").request()
-					.accept("application/java-serialization");
+			Builder builder = client.target(WEB_SERVICE_URI + "/performers").request();
 
 			// Make the service invocation via a HTTP GET message, and wait for
 			// the response.
@@ -72,16 +70,12 @@ public class DefaultService implements ConcertService {
 			int responseCode = response.getStatus();
 
 			if (responseCode == 200) {
-				response = builder.get();
-
 				// Retrieve the list of concerts
-				List<Performer> performers = response
-						.readEntity(new GenericType<List<Performer>>() {
+				List<PerformerDTO> performers = response
+						.readEntity(new GenericType<List<PerformerDTO>>() {
 						});
 
-				return performers.stream()
-						.map(PerformerMapper::convertToDTO)
-						.collect(Collectors.toSet());
+				return new HashSet<>(performers);
 			} else {
 				throw new ServiceException(responseCode + "");
 			}
@@ -90,6 +84,7 @@ public class DefaultService implements ConcertService {
 		} finally {
 			// Close the Response object.
 			response.close();
+			client.close();
 		}
 	}
 

@@ -1,9 +1,12 @@
 package nz.ac.auckland.concert.service.services;
 
 import nz.ac.auckland.concert.common.dto.ConcertDTO;
+import nz.ac.auckland.concert.common.dto.PerformerDTO;
+import nz.ac.auckland.concert.common.dto.UserDTO;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
 import nz.ac.auckland.concert.service.mappers.ConcertMapper;
+import nz.ac.auckland.concert.service.mappers.PerformerMapper;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
@@ -92,14 +95,21 @@ public class ConcertResource {
 		_em.getTransaction().begin();
 
 		TypedQuery<Performer> performerQuery =
-				_em.createQuery("SELECT p FROM PERFORMERS p", Performer.class);
+				_em.createQuery("select p from Performer p", Performer.class);
 		List<Performer> performers = performerQuery.getResultList();
 
 		Response.ResponseBuilder rb = new ResponseBuilderImpl();
 		if (performers == null) {
 			throw new WebApplicationException(Response.Status.NOT_FOUND);
 		} else {
-			rb.entity(performers);
+			List<PerformerDTO> performerDTOS = performers.stream()
+					.map(PerformerMapper::convertToDTO)
+					.collect(Collectors.toList());
+
+			GenericEntity<List<PerformerDTO>> genericEntity = new GenericEntity<List<PerformerDTO>>(performerDTOS) {
+			};
+
+			rb.entity(genericEntity);
 			rb.status(200);
 		}
 
@@ -128,6 +138,13 @@ public class ConcertResource {
 
 		_em.close();
 		return rb.build();
+	}
+
+	@POST
+	public Response createUser(UserDTO user) {
+		_em.getTransaction().begin();
+
+
 	}
 
 	/**
