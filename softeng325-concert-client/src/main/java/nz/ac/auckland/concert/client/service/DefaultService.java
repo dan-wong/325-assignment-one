@@ -1,9 +1,11 @@
 package nz.ac.auckland.concert.client.service;
 
 import nz.ac.auckland.concert.common.dto.*;
+import nz.ac.auckland.concert.common.message.Messages;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -43,8 +45,6 @@ public class DefaultService implements ConcertService {
 			} else {
 				throw new ServiceException(responseCode + "");
 			}
-		} catch (ServiceException e) {
-			throw new ServiceException(e.getMessage());
 		} finally {
 			// Close the Response object.
 			response.close();
@@ -79,8 +79,6 @@ public class DefaultService implements ConcertService {
 			} else {
 				throw new ServiceException(responseCode + "");
 			}
-		} catch (ServiceException e) {
-			throw new ServiceException(e.getMessage());
 		} finally {
 			// Close the Response object.
 			response.close();
@@ -89,9 +87,40 @@ public class DefaultService implements ConcertService {
 	}
 
 	@Override
-	public UserDTO createUser(UserDTO newUser) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+	public UserDTO createUser(UserDTO newUser) {
+		Response response = null;
+		Client client = ClientBuilder.newClient();
+
+		//Check all fields are filled
+		if (newUser.getFirstname() == null || newUser.getLastname() == null ||
+				newUser.getPassword() == null || newUser.getUsername() == null) {
+			throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
+		}
+
+		try {
+			// Make an invocation on a Concert URI and specify Java-
+			// serialization as the required data format.
+			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
+
+			// Make the service invocation via a HTTP GET message, and wait for
+			// the response.
+			response = builder.post(Entity.entity(newUser, javax.ws.rs.core.MediaType.APPLICATION_XML));
+
+			// Check that the HTTP response code is 201 OK.
+			int responseCode = response.getStatus();
+
+			if (responseCode == 201) {
+				UserDTO user = response.readEntity(UserDTO.class);
+
+				return user;
+			} else {
+				throw new ServiceException(responseCode + "");
+			}
+		} finally {
+			// Close the Response object.
+			response.close();
+			client.close();
+		}
 	}
 
 	@Override

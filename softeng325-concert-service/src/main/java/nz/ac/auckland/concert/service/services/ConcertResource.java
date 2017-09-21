@@ -3,10 +3,14 @@ package nz.ac.auckland.concert.service.services;
 import nz.ac.auckland.concert.common.dto.ConcertDTO;
 import nz.ac.auckland.concert.common.dto.PerformerDTO;
 import nz.ac.auckland.concert.common.dto.UserDTO;
+import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
+import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.ConcertMapper;
 import nz.ac.auckland.concert.service.mappers.PerformerMapper;
+import nz.ac.auckland.concert.service.mappers.UserMapper;
+import org.hibernate.service.spi.ServiceException;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
@@ -141,10 +145,27 @@ public class ConcertResource {
 	}
 
 	@POST
-	public Response createUser(UserDTO user) {
+	@Path("/user")
+	public Response createUser(UserDTO userDTO) {
+		User user = UserMapper.convertToModel(userDTO);
+
+		//If the conversion returns a User object, that means the username is taken
+		if (user != null) {
+			throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
+		}
+
+		user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getFirstname(), userDTO.getLastname());
+
 		_em.getTransaction().begin();
+		_em.persist(user);
+		_em.getTransaction().commit();
 
+		Response.ResponseBuilder rb = new ResponseBuilderImpl();
+		rb.entity(userDTO);
+		rb.status(201);
 
+		_em.close();
+		return rb.build();
 	}
 
 	/**

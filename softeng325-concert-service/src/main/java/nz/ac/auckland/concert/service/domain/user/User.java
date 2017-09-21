@@ -29,10 +29,45 @@ public class User {
 	@JoinColumn(name = "id", nullable = false)
 	private Set<Booking> _bookings;
 
-	@Embedded
-	@Column(name = "CREDIT_CARD")
-	private CreditCard _creditCard;
+//	@Embedded
+//	@Column(name = "CREDIT_CARD")
+//	private CreditCard _creditCard;
 
 	protected User() {
 	}
+
+	public User(String username, String password, String firstName, String lastName) {
+		_username = username;
+		_password = password;
+		_firstName = firstName;
+		_lastName = lastName;
+	}
+
+	public Long getID() {
+		return _id;
+	}
+
+	public String getUsername() {
+		return _username;
+	}
+
+	public String getPassword() {
+		return _password;
+	}
+
+	public String getFirstName() {
+		return _firstName;
+	}
+
+	public String getLastName() {
+		return _lastName;
+	}
+
+	public Set<Booking> getBookings() {
+		return _bookings;
+	}
+
+//	public CreditCard getCreditCard() {
+//		return _creditCard;
+//	}
 }
