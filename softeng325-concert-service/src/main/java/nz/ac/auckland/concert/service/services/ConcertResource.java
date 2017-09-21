@@ -18,6 +18,7 @@ import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -173,27 +174,34 @@ public class ConcertResource {
 	}
 
 	@POST
-	@Path("/user")
-	public Response registerCreditCard(CreditCardDTO creditCardDTO) {
-		CreditCard creditCard = CreditCardMapper.convertToDTO(creditCardDTO);
-
-		user = new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getFirstname(), userDTO.getLastname());
-
-		//Generate a random UUID and set the User field to that value
-		UUID uuid = UUID.randomUUID();
-		user.setUUID(uuid);
-
-		//Create a new cookie with the UUID
-		NewCookie cookie = makeCookie(uuid);
+	@Path("/user/creditcard")
+	public Response registerCreditCard(@CookieParam("UUID") Cookie cookie, CreditCardDTO creditCardDTO) {
+		CreditCard creditCard = CreditCardMapper.convertToModel(creditCardDTO);
 
 		_em.getTransaction().begin();
+
+		//Find a user associated with this cookie
+		TypedQuery<User> userQuery =
+				_em.createQuery("SELECT u FROM User AS u WHERE u._uuid = :uuid", User.class);
+		userQuery.setParameter("uuid", UUID.fromString(cookie.getValue().substring(6)));
+		List<User> userList = userQuery.setMaxResults(1).getResultList();
+
+		User user = userList.size() == 0 ? null : userList.get(0);
+
+		if (user == null) {
+			throw new BadRequestException(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(Messages.AUTHENTICATE_NON_EXISTENT_USER)
+					.build());
+		}
+
+		user.addCreditCard(creditCard);
+
 		_em.persist(user);
 		_em.getTransaction().commit();
 
 		Response.ResponseBuilder rb = new ResponseBuilderImpl();
-		rb.entity(userDTO);
-		rb.cookie(cookie);
-		rb.status(201);
+		rb.status(204);
 
 		_em.close();
 		return rb.build();

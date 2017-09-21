@@ -73,6 +73,10 @@ public class User {
 		return _creditCards;
 	}
 
+	public void addCreditCard(CreditCard creditCard) {
+		_creditCards.add(creditCard);
+	}
+
 	public UUID getUUID() {
 		return _uuid;
 	}

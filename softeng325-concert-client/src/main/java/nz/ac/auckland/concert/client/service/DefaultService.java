@@ -8,15 +8,15 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class DefaultService implements ConcertService {
 	private static String WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
+	private NewCookie _cookie = null;
 
 	@Override
 	public Set<ConcertDTO> getConcerts() throws ServiceException {
@@ -106,6 +106,7 @@ public class DefaultService implements ConcertService {
 
 			switch (responseCode) {
 				case 201:
+					saveCookie(response);
 					return response.readEntity(UserDTO.class);
 				case 400:
 					String message = response.readEntity(String.class);
@@ -150,6 +151,7 @@ public class DefaultService implements ConcertService {
 					UserDTO retrievedUser = response.readEntity(UserDTO.class);
 
 					if (retrievedUser.getUsername().equals(user.getUsername()) && retrievedUser.getPassword().equals(user.getPassword())) {
+						saveCookie(response);
 						return retrievedUser;
 					} else {
 						throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
@@ -189,13 +191,19 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public void registerCreditCard(CreditCardDTO creditCard) throws ServiceException {
+		if (_cookie == null) {
+			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+		}
+
 		Response response = null;
 		Client client = ClientBuilder.newClient();
 
 		try {
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
-			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
+			Builder builder = client.target(WEB_SERVICE_URI + "/user/creditcard").request();
+
+			builder.cookie("UUID", _cookie.toString());
 
 			// Make the service invocation via a HTTP GET message, and wait for
 			// the response.
@@ -205,9 +213,9 @@ public class DefaultService implements ConcertService {
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
-				case 200:
-
-				case 400:
+				case 204:
+					break;
+				case 401:
 					String message = response.readEntity(String.class);
 					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
 						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
@@ -237,6 +245,13 @@ public class DefaultService implements ConcertService {
 	@Override
 	public void cancelSubscription() {
 		throw new UnsupportedOperationException();
+	}
+
+	private void saveCookie(Response response) {
+		Map<String, NewCookie> cookies = response.getCookies();
+		if (cookies.containsKey("UUID")) {
+			_cookie = cookies.get("UUID");
+		}
 	}
 
 }
