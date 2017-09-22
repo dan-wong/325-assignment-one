@@ -1,18 +1,12 @@
 package nz.ac.auckland.concert.service.services;
 
-import nz.ac.auckland.concert.common.dto.ConcertDTO;
-import nz.ac.auckland.concert.common.dto.CreditCardDTO;
-import nz.ac.auckland.concert.common.dto.PerformerDTO;
-import nz.ac.auckland.concert.common.dto.UserDTO;
+import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
 import nz.ac.auckland.concert.service.domain.user.CreditCard;
 import nz.ac.auckland.concert.service.domain.user.User;
-import nz.ac.auckland.concert.service.mappers.ConcertMapper;
-import nz.ac.auckland.concert.service.mappers.CreditCardMapper;
-import nz.ac.auckland.concert.service.mappers.PerformerMapper;
-import nz.ac.auckland.concert.service.mappers.UserMapper;
+import nz.ac.auckland.concert.service.mappers.*;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
@@ -227,14 +221,14 @@ public class ConcertResource {
 		}
 
 		List<BookingDTO> bookingDTOS = user.getBookings().stream()
-				.map(ConcertMapper::convertToDTO)
+				.map(BookingMapper::convertToDTO)
 				.collect(Collectors.toList());
 
-		GenericEntity<List<ConcertDTO>> genericEntity = new GenericEntity<List<ConcertDTO>>(concertDTOS) {
+		GenericEntity<List<BookingDTO>> genericEntity = new GenericEntity<List<BookingDTO>>(bookingDTOS) {
 		};
 
 		Response.ResponseBuilder rb = new ResponseBuilderImpl();
-		rb.entity(user.getBookings());
+		rb.entity(bookingDTOS);
 		rb.status(200);
 
 		_em.close();

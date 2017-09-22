@@ -3,6 +3,7 @@ package nz.ac.auckland.concert.service.domain.concert;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
@@ -12,11 +13,22 @@ public class Seat {
 	@EmbeddedId
 	private SeatKey _id;
 
+	@Column(name = "booked", nullable = false)
+	private Boolean _booked = false;
+
 	protected Seat() {
 	}
 
 	public SeatKey getSeatKey() {
 		return _id;
+	}
+
+	public void bookSeats() {
+		_booked = true;
+	}
+
+	public void unbookSeats() {
+		_booked = false;
 	}
 
 	@Override

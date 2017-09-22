@@ -24,15 +24,9 @@ public class DefaultService implements ConcertService {
 		Client client = ClientBuilder.newClient();
 
 		try {
-			// Make an invocation on a Concert URI and specify Java-
-			// serialization as the required data format.
 			Builder builder = client.target(WEB_SERVICE_URI).request();
-
-			// Make the service invocation via a HTTP GET message, and wait for
-			// the response.
 			response = builder.get();
 
-			// Check that the HTTP response code is 200 OK.
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
@@ -59,15 +53,9 @@ public class DefaultService implements ConcertService {
 		Client client = ClientBuilder.newClient();
 
 		try {
-			// Make an invocation on a Concert URI and specify Java-
-			// serialization as the required data format.
 			Builder builder = client.target(WEB_SERVICE_URI + "/performers").request();
-
-			// Make the service invocation via a HTTP GET message, and wait for
-			// the response.
 			response = builder.get();
 
-			// Check that the HTTP response code is 200 OK.
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
@@ -93,15 +81,9 @@ public class DefaultService implements ConcertService {
 		Client client = ClientBuilder.newClient();
 
 		try {
-			// Make an invocation on a Concert URI and specify Java-
-			// serialization as the required data format.
 			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
-
-			// Make the service invocation via a HTTP GET message, and wait for
-			// the response.
 			response = builder.post(Entity.entity(newUser, javax.ws.rs.core.MediaType.APPLICATION_XML));
 
-			// Check that the HTTP response code is 201 OK.
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
@@ -135,15 +117,9 @@ public class DefaultService implements ConcertService {
 		}
 
 		try {
-			// Make an invocation on a Concert URI and specify Java-
-			// serialization as the required data format.
 			Builder builder = client.target(WEB_SERVICE_URI + "/user/" + user.getUsername()).request();
-
-			// Make the service invocation via a HTTP GET message, and wait for
-			// the response.
 			response = builder.get();
 
-			// Check that the HTTP response code is 201 OK.
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
@@ -179,8 +155,42 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public ReservationDTO reserveSeats(ReservationRequestDTO reservationRequest) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		Response response = null;
+		Client client = ClientBuilder.newClient();
+
+		try {
+			Builder builder = client.target(WEB_SERVICE_URI + "/concert/").request();
+
+			// Make the service invocation via a HTTP GET message, and wait for
+			// the response.
+			response = builder.get();
+
+			// Check that the HTTP response code is 201 OK.
+			int responseCode = response.getStatus();
+
+			switch (responseCode) {
+				case 200:
+					UserDTO retrievedUser = response.readEntity(UserDTO.class);
+
+					if (retrievedUser.getUsername().equals(user.getUsername()) && retrievedUser.getPassword().equals(user.getPassword())) {
+						saveCookie(response);
+						return retrievedUser;
+					} else {
+						throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
+					}
+				case 400:
+					String message = response.readEntity(String.class);
+					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
+						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
+					}
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+			}
+		} finally {
+			// Close the Response object.
+			response.close();
+			client.close();
+		}
 	}
 
 	@Override
@@ -255,7 +265,11 @@ public class DefaultService implements ConcertService {
 
 			switch (responseCode) {
 				case 200:
-					return response.readEntity(Set.class);
+					// Retrieve the list of concerts
+					List<BookingDTO> bookings = response.readEntity(new GenericType<List<BookingDTO>>() {
+					});
+
+					return new HashSet<>(bookings);
 				case 401:
 					String message = response.readEntity(String.class);
 					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
