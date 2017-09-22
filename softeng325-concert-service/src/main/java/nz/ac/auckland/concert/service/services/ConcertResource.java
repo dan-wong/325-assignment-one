@@ -3,12 +3,15 @@ package nz.ac.auckland.concert.service.services;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.common.types.PriceBand;
+import nz.ac.auckland.concert.common.types.SeatNumber;
 import nz.ac.auckland.concert.common.types.SeatRow;
 import nz.ac.auckland.concert.common.util.TheatreLayout;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
 import nz.ac.auckland.concert.service.domain.concert.Seat;
+import nz.ac.auckland.concert.service.domain.concert.SeatKey;
 import nz.ac.auckland.concert.service.domain.user.CreditCard;
+import nz.ac.auckland.concert.service.domain.user.Reservation;
 import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.*;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
@@ -21,6 +24,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -234,12 +238,13 @@ public class ConcertResource {
 	public Response createReservation(@CookieParam("UUID") Cookie cookie, ReservationRequestDTO reservationRequest) {
 		_em.getTransaction().begin();
 
+		//Check user authentication is OK
 		User user = authenticateUser(cookie);
 
 		if (user == null) {
 			throw new BadRequestException(Response
 					.status(Response.Status.UNAUTHORIZED)
-					.entity(Messages.AUTHENTICATE_NON_EXISTENT_USER)
+					.entity(Messages.BAD_AUTHENTICATON_TOKEN)
 					.build());
 		}
 
@@ -248,6 +253,30 @@ public class ConcertResource {
 		Long concertId = reservationRequest.getConcertId();
 		LocalDateTime date = reservationRequest.getDate();
 
+		//Check if a concert exists at this time
+		TypedQuery<Concert> concertQuery =
+				_em.createQuery("SELECT c FROM Concert c WHERE c._id = :id", Concert.class);
+		concertQuery.setParameter("id", concertId);
+		List<Concert> concerts = concertQuery.getResultList();
+
+		if (concerts != null) {
+			if (!concerts.get(0).getDates().contains(date)) {
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE)
+						.build());
+			}
+		} else {
+			throw new BadRequestException(Response
+					.status(Response.Status.BAD_REQUEST)
+					.entity(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE)
+					.build());
+		}
+
+		//Create a Set of seats that are to be reserved
+		Set<Seat> reservationSeats = new HashSet<>();
+
+		//Get all the reserved seats for this particular concert
 		TypedQuery<Seat> seatQuery =
 				_em.createQuery("SELECT s FROM Seat s WHERE s._id._concertId = :concertId AND s._id._date = :date", Seat.class);
 		seatQuery.setParameter("concertId", concertId);
@@ -255,14 +284,45 @@ public class ConcertResource {
 		List<Seat> seats = seatQuery.getResultList(); //List of taken seats for the concert
 
 		Set<SeatRow> rows = TheatreLayout.getRowsForPriceBand(priceBand);
+
+		outer_loop:
 		for (SeatRow row : rows) {
 			int seatsForRow = TheatreLayout.getNumberOfSeatsForRow(row);
 			for (int i = 0; i < seatsForRow; i++) {
-				Seat seat = new Seat()
+				Seat seat = new Seat(new SeatKey(row, new SeatNumber(i), concertId, date));
+
+				if (!seats.contains(seat)) {
+					reservationSeats.add(seat);
+				}
+
+				if (reservationSeats.size() == numberOfSeats) {
+					break outer_loop;
+				}
 			}
 		}
 
+		//Check if seats have been found, if not throw exception
+		if (reservationSeats.size() != numberOfSeats) {
+			throw new BadRequestException(Response
+					.status(Response.Status.BAD_REQUEST)
+					.entity(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION)
+					.build());
+		}
+
+		Reservation reservation = new Reservation(reservationSeats, concertId, date);
+		_em.persist(reservation);
+
+		Set<SeatDTO> reservationSeatsDTO = reservationSeats.stream()
+				.map(SeatMapper::convertToDTO)
+				.collect(Collectors.toSet());
+
+		ReservationDTO reservationDTO = new ReservationDTO(reservation.getId(), reservationRequest, reservationSeatsDTO);
+		Response.ResponseBuilder rb = new ResponseBuilderImpl();
+		rb.entity(reservationDTO);
+		rb.status(201);
+
 		_em.close();
+		return rb.build();
 	}
 
 	private User authenticateUser(Cookie cookie) {

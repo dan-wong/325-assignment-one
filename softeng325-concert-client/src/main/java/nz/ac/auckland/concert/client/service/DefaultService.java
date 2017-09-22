@@ -155,6 +155,17 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public ReservationDTO reserveSeats(ReservationRequestDTO reservationRequest) throws ServiceException {
+		if (_cookie == null) {
+			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+		}
+
+		if (reservationRequest.getNumberOfSeats() == 0 ||
+				reservationRequest.getDate() == null ||
+				reservationRequest.getConcertId() == null ||
+				reservationRequest.getSeatType() == null) {
+			throw new ServiceException(Messages.RESERVATION_REQUEST_WITH_MISSING_FIELDS);
+		}
+
 		Response response = null;
 		Client client = ClientBuilder.newClient();
 
@@ -169,15 +180,8 @@ public class DefaultService implements ConcertService {
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
-				case 200:
-					UserDTO retrievedUser = response.readEntity(UserDTO.class);
+				case 201:
 
-					if (retrievedUser.getUsername().equals(user.getUsername()) && retrievedUser.getPassword().equals(user.getPassword())) {
-						saveCookie(response);
-						return retrievedUser;
-					} else {
-						throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_ILLEGAL_PASSWORD);
-					}
 				case 400:
 					String message = response.readEntity(String.class);
 					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {

@@ -1,6 +1,6 @@
 package nz.ac.auckland.concert.service.domain.user;
 
-import nz.ac.auckland.concert.common.types.PriceBand;
+import nz.ac.auckland.concert.service.domain.concert.Seat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "RESERVATION")
@@ -19,8 +20,10 @@ public class Reservation {
 	@GeneratedValue
 	private Long _id;
 
-	@Column(name = "SEATTYPE", nullable = false)
-	private PriceBand _seatType;
+	@ElementCollection
+	@OneToMany(cascade = CascadeType.ALL)
+	@Column(name = "SEATS", nullable = false)
+	private Set<Seat> _seats;
 
 	@Column(name = "CONCERT_ID", nullable = false)
 	private Long _concertId;
@@ -28,7 +31,13 @@ public class Reservation {
 	@Column(name = "DATE_TIME", nullable = false)
 	private LocalDateTime _date;
 
-	public Reservation() {
+	protected Reservation() {
+	}
+
+	public Reservation(Set<Seat> seats, Long concertId, LocalDateTime date) {
+		_seats = seats;
+		_concertId = concertId;
+		_date = date;
 	}
 
 	public Long getId() {
@@ -45,7 +54,7 @@ public class Reservation {
 		Reservation rhs = (Reservation) obj;
 		return new EqualsBuilder().
 				append(_id, rhs._id).
-				append(_seatType, rhs._seatType).
+				append(_seats, rhs._seats).
 				append(_concertId, rhs._concertId).
 				append(_date, rhs._date).
 				isEquals();
@@ -55,7 +64,7 @@ public class Reservation {
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31).
 				append(_id).
-				append(_seatType).
+				append(_seats).
 				append(_concertId).
 				append(_date).
 				hashCode();
