@@ -5,5 +5,5 @@ package nz.ac.auckland.concert.common.types;
  *
  */
 public enum SeatRow {
-	A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R
+	A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R
 }
