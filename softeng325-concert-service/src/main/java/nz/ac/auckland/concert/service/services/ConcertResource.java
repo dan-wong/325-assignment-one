@@ -243,7 +243,7 @@ public class ConcertResource {
 
 		if (user == null) {
 			throw new BadRequestException(Response
-					.status(Response.Status.UNAUTHORIZED)
+					.status(Response.Status.BAD_REQUEST)
 					.entity(Messages.BAD_AUTHENTICATON_TOKEN)
 					.build());
 		}
@@ -288,7 +288,7 @@ public class ConcertResource {
 		outer_loop:
 		for (SeatRow row : rows) {
 			int seatsForRow = TheatreLayout.getNumberOfSeatsForRow(row);
-			for (int i = 0; i < seatsForRow; i++) {
+			for (int i = 1; i <= seatsForRow; i++) {
 				Seat seat = new Seat(new SeatKey(row, new SeatNumber(i), concertId, date));
 
 				if (!seats.contains(seat)) {
@@ -326,6 +326,10 @@ public class ConcertResource {
 	}
 
 	private User authenticateUser(Cookie cookie) {
+		if (cookie == null) {
+			return null;
+		}
+
 		//Find a user associated with this cookie
 		TypedQuery<User> userQuery =
 				_em.createQuery("SELECT u FROM User u WHERE u._uuid = :uuid", User.class);

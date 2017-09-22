@@ -170,18 +170,15 @@ public class DefaultService implements ConcertService {
 		Client client = ClientBuilder.newClient();
 
 		try {
-			Builder builder = client.target(WEB_SERVICE_URI + "/concert/reservation").request();
-
-			// Make the service invocation via a HTTP GET message, and wait for
-			// the response.
+			Builder builder = client.target(WEB_SERVICE_URI + "/reservation").request();
+			builder.cookie("UUID", _cookie.toString());
 			response = builder.post(Entity.entity(reservationRequest, javax.ws.rs.core.MediaType.APPLICATION_XML));
 
-			// Check that the HTTP response code is 201 OK.
 			int responseCode = response.getStatus();
 
 			switch (responseCode) {
 				case 201:
-
+					return response.readEntity(ReservationDTO.class);
 				case 400:
 					String message = response.readEntity(String.class);
 					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {

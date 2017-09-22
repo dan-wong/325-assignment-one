@@ -32,10 +32,8 @@ public class ConcertApplication extends Application {
 		try {
 			em = PersistenceManager.instance().createEntityManager();
 			em.getTransaction().begin();
-			em.createQuery("delete from Booking").executeUpdate();
-			em.createQuery("delete from Seat").executeUpdate();
-			em.createQuery("delete from User").executeUpdate();
-			em.createQuery("delete from Reservation").executeUpdate();
+
+			//Delete Stuff
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
