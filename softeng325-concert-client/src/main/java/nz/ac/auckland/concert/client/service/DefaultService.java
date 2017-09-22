@@ -159,11 +159,11 @@ public class DefaultService implements ConcertService {
 		Client client = ClientBuilder.newClient();
 
 		try {
-			Builder builder = client.target(WEB_SERVICE_URI + "/concert/").request();
+			Builder builder = client.target(WEB_SERVICE_URI + "/concert/reservation").request();
 
 			// Make the service invocation via a HTTP GET message, and wait for
 			// the response.
-			response = builder.get();
+			response = builder.post(Entity.entity(reservationRequest, javax.ws.rs.core.MediaType.APPLICATION_XML));
 
 			// Check that the HTTP response code is 201 OK.
 			int responseCode = response.getStatus();

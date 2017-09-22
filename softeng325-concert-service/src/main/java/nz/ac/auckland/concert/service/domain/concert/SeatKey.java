@@ -6,7 +6,9 @@ import nz.ac.auckland.concert.service.domain.jpa.SeatNumberConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -23,13 +25,20 @@ public class SeatKey implements Serializable {
 	@Convert(converter = SeatNumberConverter.class)
 	private SeatNumber _number;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Concert _concert;
+	@Column(name = "CONCERT_ID", nullable = false)
+	private Long _concertId;
 
 	@Column(name = "DATE", nullable = false)
 	private LocalDateTime _date;
 
 	protected SeatKey() {
+	}
+
+	public SeatKey(SeatRow row, SeatNumber number, Long concertId, LocalDateTime date) {
+		_row = row;
+		_number = number;
+		_concertId = concertId;
+		_date = date;
 	}
 
 	public SeatRow getSeatRow() {
@@ -40,8 +49,8 @@ public class SeatKey implements Serializable {
 		return _number;
 	}
 
-	public Concert getConcert() {
-		return _concert;
+	public Long getConcertId() {
+		return _concertId;
 	}
 
 	public LocalDateTime getDate() {
@@ -59,7 +68,7 @@ public class SeatKey implements Serializable {
 		return new EqualsBuilder().
 				append(_row, rhs._row).
 				append(_number, rhs._number).
-				append(_concert, rhs._concert).
+				append(_concertId, rhs._concertId).
 				append(_date, rhs._date).
 				isEquals();
 	}
@@ -67,6 +76,8 @@ public class SeatKey implements Serializable {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31).
+				append(_concertId).
+				append(_date).
 				append(_row).
 				append(_number).
 				hashCode();

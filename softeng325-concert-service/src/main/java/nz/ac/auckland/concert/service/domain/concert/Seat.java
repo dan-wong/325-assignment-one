@@ -19,6 +19,10 @@ public class Seat {
 	protected Seat() {
 	}
 
+	public Seat(SeatKey id) {
+		_id = id;
+	}
+
 	public SeatKey getSeatKey() {
 		return _id;
 	}

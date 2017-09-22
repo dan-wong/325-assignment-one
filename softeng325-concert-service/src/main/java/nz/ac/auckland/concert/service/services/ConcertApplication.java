@@ -1,5 +1,6 @@
 package nz.ac.auckland.concert.service.services;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -26,6 +27,23 @@ public class ConcertApplication extends Application {
 	private Set<Object> _singletons = new HashSet<Object>();
 
 	public ConcertApplication() {
+		EntityManager em = null;
+
+		try {
+			em = PersistenceManager.instance().createEntityManager();
+			em.getTransaction().begin();
+			em.createQuery("delete from Booking").executeUpdate();
+			em.createQuery("delete from Seat").executeUpdate();
+			em.createQuery("delete from User").executeUpdate();
+			em.createQuery("delete from Reservation").executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (em != null && em.isOpen()) {
+				em.close();
+			}
+		}
+
 		_singletons.add(new PersistenceManager());
 		_classes.add(ConcertResource.class);
 	}

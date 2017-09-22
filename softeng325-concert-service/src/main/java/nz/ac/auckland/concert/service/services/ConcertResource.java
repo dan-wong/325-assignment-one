@@ -2,8 +2,12 @@ package nz.ac.auckland.concert.service.services;
 
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
+import nz.ac.auckland.concert.common.types.PriceBand;
+import nz.ac.auckland.concert.common.types.SeatRow;
+import nz.ac.auckland.concert.common.util.TheatreLayout;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
+import nz.ac.auckland.concert.service.domain.concert.Seat;
 import nz.ac.auckland.concert.service.domain.user.CreditCard;
 import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.*;
@@ -16,7 +20,9 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -173,13 +179,7 @@ public class ConcertResource {
 
 		_em.getTransaction().begin();
 
-		//Find a user associated with this cookie
-		TypedQuery<User> userQuery =
-				_em.createQuery("SELECT u FROM User AS u WHERE u._uuid = :uuid", User.class);
-		userQuery.setParameter("uuid", getCookieValue(cookie));
-		List<User> userList = userQuery.setMaxResults(1).getResultList();
-
-		User user = userList.size() == 0 ? null : userList.get(0);
+		User user = authenticateUser(cookie);
 
 		if (user == null) {
 			throw new BadRequestException(Response
@@ -205,13 +205,7 @@ public class ConcertResource {
 	public Response getBookings(@CookieParam("UUID") Cookie cookie) {
 		_em.getTransaction().begin();
 
-		//Find a user associated with this cookie
-		TypedQuery<User> userQuery =
-				_em.createQuery("SELECT u FROM User AS u WHERE u._uuid = :uuid", User.class);
-		userQuery.setParameter("uuid", getCookieValue(cookie));
-		List<User> userList = userQuery.setMaxResults(1).getResultList();
-
-		User user = userList.size() == 0 ? null : userList.get(0);
+		User user = authenticateUser(cookie);
 
 		if (user == null) {
 			throw new BadRequestException(Response
@@ -233,6 +227,52 @@ public class ConcertResource {
 
 		_em.close();
 		return rb.build();
+	}
+
+	@POST
+	@Path("/reservation")
+	public Response createReservation(@CookieParam("UUID") Cookie cookie, ReservationRequestDTO reservationRequest) {
+		_em.getTransaction().begin();
+
+		User user = authenticateUser(cookie);
+
+		if (user == null) {
+			throw new BadRequestException(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(Messages.AUTHENTICATE_NON_EXISTENT_USER)
+					.build());
+		}
+
+		int numberOfSeats = reservationRequest.getNumberOfSeats();
+		PriceBand priceBand = reservationRequest.getSeatType();
+		Long concertId = reservationRequest.getConcertId();
+		LocalDateTime date = reservationRequest.getDate();
+
+		TypedQuery<Seat> seatQuery =
+				_em.createQuery("SELECT s FROM Seat s WHERE s._id._concertId = :concertId AND s._id._date = :date", Seat.class);
+		seatQuery.setParameter("concertId", concertId);
+		seatQuery.setParameter("date", date);
+		List<Seat> seats = seatQuery.getResultList(); //List of taken seats for the concert
+
+		Set<SeatRow> rows = TheatreLayout.getRowsForPriceBand(priceBand);
+		for (SeatRow row : rows) {
+			int seatsForRow = TheatreLayout.getNumberOfSeatsForRow(row);
+			for (int i = 0; i < seatsForRow; i++) {
+				Seat seat = new Seat()
+			}
+		}
+
+		_em.close();
+	}
+
+	private User authenticateUser(Cookie cookie) {
+		//Find a user associated with this cookie
+		TypedQuery<User> userQuery =
+				_em.createQuery("SELECT u FROM User u WHERE u._uuid = :uuid", User.class);
+		userQuery.setParameter("uuid", getCookieValue(cookie));
+		List<User> userList = userQuery.setMaxResults(1).getResultList();
+
+		return userList.size() == 0 ? null : userList.get(0);
 	}
 
 	private UUID getCookieValue(Cookie cookie) {
