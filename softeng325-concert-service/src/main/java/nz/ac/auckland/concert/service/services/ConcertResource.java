@@ -97,7 +97,6 @@ public class ConcertResource {
 		return rb.build();
 	}
 
-
 	@POST
 	@Path("/user")
 	public Response createUser(UserDTO userDTO) {
@@ -183,7 +182,7 @@ public class ConcertResource {
 		//Find a user associated with this cookie
 		TypedQuery<User> userQuery =
 				_em.createQuery("SELECT u FROM User AS u WHERE u._uuid = :uuid", User.class);
-		userQuery.setParameter("uuid", UUID.fromString(cookie.getValue().substring(6)));
+		userQuery.setParameter("uuid", getCookieValue(cookie));
 		List<User> userList = userQuery.setMaxResults(1).getResultList();
 
 		User user = userList.size() == 0 ? null : userList.get(0);
@@ -205,6 +204,45 @@ public class ConcertResource {
 
 		_em.close();
 		return rb.build();
+	}
+
+	@GET
+	@Path("/user")
+	public Response getBookings(@CookieParam("UUID") Cookie cookie) {
+		_em.getTransaction().begin();
+
+		//Find a user associated with this cookie
+		TypedQuery<User> userQuery =
+				_em.createQuery("SELECT u FROM User AS u WHERE u._uuid = :uuid", User.class);
+		userQuery.setParameter("uuid", getCookieValue(cookie));
+		List<User> userList = userQuery.setMaxResults(1).getResultList();
+
+		User user = userList.size() == 0 ? null : userList.get(0);
+
+		if (user == null) {
+			throw new BadRequestException(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.entity(Messages.AUTHENTICATE_NON_EXISTENT_USER)
+					.build());
+		}
+
+		List<BookingDTO> bookingDTOS = user.getBookings().stream()
+				.map(ConcertMapper::convertToDTO)
+				.collect(Collectors.toList());
+
+		GenericEntity<List<ConcertDTO>> genericEntity = new GenericEntity<List<ConcertDTO>>(concertDTOS) {
+		};
+
+		Response.ResponseBuilder rb = new ResponseBuilderImpl();
+		rb.entity(user.getBookings());
+		rb.status(200);
+
+		_em.close();
+		return rb.build();
+	}
+
+	private UUID getCookieValue(Cookie cookie) {
+		return UUID.fromString(cookie.getValue().substring(6));
 	}
 
 	private NewCookie makeCookie(UUID uuid) {

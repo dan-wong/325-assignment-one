@@ -15,6 +15,10 @@ public class Seat {
 	protected Seat() {
 	}
 
+	public SeatKey getSeatKey() {
+		return _id;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Seat))

@@ -232,8 +232,43 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public Set<BookingDTO> getBookings() throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		if (_cookie == null) {
+			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+		}
+
+		Response response = null;
+		Client client = ClientBuilder.newClient();
+
+		try {
+			// Make an invocation on a Concert URI and specify Java-
+			// serialization as the required data format.
+			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
+
+			builder.cookie("UUID", _cookie.toString());
+
+			// Make the service invocation via a HTTP GET message, and wait for
+			// the response.
+			response = builder.get();
+
+			// Check that the HTTP response code is 201 OK.
+			int responseCode = response.getStatus();
+
+			switch (responseCode) {
+				case 200:
+					return response.readEntity(Set.class);
+				case 401:
+					String message = response.readEntity(String.class);
+					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
+						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
+					}
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+			}
+		} finally {
+			// Close the Response object.
+			response.close();
+			client.close();
+		}
 	}
 
 	@Override

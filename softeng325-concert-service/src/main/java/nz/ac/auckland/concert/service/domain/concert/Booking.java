@@ -39,6 +39,22 @@ public class Booking {
 		_priceBand = priceBand;
 	}
 
+	public Concert getConcert() {
+		return _concert;
+	}
+
+	public LocalDateTime getDateTime() {
+		return _dateTime;
+	}
+
+	public Set<Seat> getSeats() {
+		return _seats;
+	}
+
+	public PriceBand getPriceBand() {
+		return _priceBand;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Booking))
