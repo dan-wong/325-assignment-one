@@ -43,8 +43,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -72,8 +77,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -105,8 +115,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -146,9 +161,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -195,9 +214,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -244,9 +267,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 
@@ -291,8 +318,13 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			response.close();
-			client.close();
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
 		}
 	}
 

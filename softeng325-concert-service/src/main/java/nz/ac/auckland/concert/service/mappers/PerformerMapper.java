@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 public class PerformerMapper {
+	private static EntityManager _em = PersistenceManager.instance().createEntityManager();
+
 	public static PerformerDTO convertToDTO(Performer performer) {
 		Set<Long> concertIds = new HashSet<>();
 		for (Concert concert : performer.getConcerts()) {
@@ -22,17 +24,10 @@ public class PerformerMapper {
 	}
 
 	public static Performer convertToModel(PerformerDTO performerDTO) {
-		EntityManager em = PersistenceManager.instance().createEntityManager();
-
-		// Start a new transaction.
-		em.getTransaction().begin();
-
 		TypedQuery<Concert> concertQuery =
-				em.createQuery("SELECT c FROM CONCERTS c WHERE c.id in :ids", Concert.class);
+				_em.createQuery("SELECT c FROM CONCERTS c WHERE c.id in :ids", Concert.class);
 		concertQuery.setParameter("ids", performerDTO.getConcertIds());
 		List<Concert> concerts = concertQuery.getResultList();
-
-		em.close();
 
 		return new Performer(performerDTO.getId(), performerDTO.getName(), performerDTO.getImageName(), performerDTO.getGenre(), new HashSet<>(concerts));
 	}

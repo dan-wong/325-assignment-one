@@ -18,6 +18,8 @@ import java.util.Set;
  * Mapper class which maps the ConcertDTO to Concert Domain Model class and vice versa
  */
 public class ConcertMapper {
+	private static EntityManager _em = PersistenceManager.instance().createEntityManager();
+
 	public static ConcertDTO convertToDTO(Concert concert) {
 		Set<Long> performerIds = new HashSet<>();
 		for (Performer performer : concert.getPerformers()) {
@@ -33,17 +35,10 @@ public class ConcertMapper {
 			priceTariffs.put(pb, concertDTO.getTicketPrice(pb));
 		}
 
-		EntityManager em = PersistenceManager.instance().createEntityManager();
-
-		// Start a new transaction.
-		em.getTransaction().begin();
-
 		TypedQuery<Performer> performerQuery =
-				em.createQuery("SELECT p FROM Performer p WHERE p.id in :ids", Performer.class);
+				_em.createQuery("SELECT p FROM Performer p WHERE p.id in :ids", Performer.class);
 		performerQuery.setParameter("ids", concertDTO.getPerformerIds());
 		List<Performer> performers = performerQuery.getResultList();
-
-		em.close();
 
 		return new Concert(concertDTO.getId(), concertDTO.getTitle(), concertDTO.getDates(), priceTariffs, new HashSet<>(performers));
 	}

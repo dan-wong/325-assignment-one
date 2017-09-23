@@ -9,22 +9,17 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class UserMapper {
+	private static EntityManager _em = PersistenceManager.instance().createEntityManager();
+
 	public static UserDTO convertToDTO(User user) {
 		return new UserDTO(user.getUsername(), user.getPassword(), user.getLastName(), user.getFirstName());
 	}
 
 	public static User convertToModel(UserDTO userDTO) {
-		EntityManager em = PersistenceManager.instance().createEntityManager();
-
-		// Start a new transaction.
-		em.getTransaction().begin();
-
 		TypedQuery<User> userQuery =
-				em.createQuery("SELECT u FROM User AS u WHERE u._username = :username", User.class);
+				_em.createQuery("SELECT u FROM User AS u WHERE u._username = :username", User.class);
 		userQuery.setParameter("username", userDTO.getUsername());
 		List<User> user = userQuery.setMaxResults(1).getResultList();
-
-		em.close();
 
 		return user.size() == 0 ? null : user.get(0);
 	}
