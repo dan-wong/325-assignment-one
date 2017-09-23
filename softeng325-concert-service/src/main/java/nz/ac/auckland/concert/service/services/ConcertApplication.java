@@ -35,6 +35,9 @@ public class ConcertApplication extends Application {
 	private Set<Object> _singletons = new HashSet<Object>();
 
 	public ConcertApplication() {
+		_singletons.add(new PersistenceManager());
+		_classes.add(ConcertResource.class);
+
 		EntityManager em = null;
 
 		try {
@@ -69,9 +72,6 @@ public class ConcertApplication extends Application {
 				em.close();
 			}
 		}
-
-		_singletons.add(new PersistenceManager());
-		_classes.add(ConcertResource.class);
 	}
 
 	@Override

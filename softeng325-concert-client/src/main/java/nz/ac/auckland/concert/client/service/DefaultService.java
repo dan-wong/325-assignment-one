@@ -106,11 +106,7 @@ public class DefaultService implements ConcertService {
 					return response.readEntity(UserDTO.class);
 				case 400:
 					String message = response.readEntity(String.class);
-					if (message.equals(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME)) {
-						throw new ServiceException(Messages.CREATE_USER_WITH_NON_UNIQUE_NAME);
-					} else {
-						throw new ServiceException(Messages.CREATE_USER_WITH_MISSING_FIELDS);
-					}
+					throw new ServiceException(message);
 				default:
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
@@ -154,9 +150,7 @@ public class DefaultService implements ConcertService {
 					}
 				case 400:
 					String message = response.readEntity(String.class);
-					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
-						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
-					}
+					throw new ServiceException(message);
 				default:
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
@@ -207,9 +201,7 @@ public class DefaultService implements ConcertService {
 					return response.readEntity(ReservationDTO.class);
 				case 400:
 					String message = response.readEntity(String.class);
-					if (message.equals(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE)) {
-						throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
-					}
+					throw new ServiceException(message);
 				default:
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
@@ -260,9 +252,7 @@ public class DefaultService implements ConcertService {
 					return;
 				case 401:
 					String message = response.readEntity(String.class);
-					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
-						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
-					}
+					throw new ServiceException(message);
 				default:
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
@@ -311,9 +301,7 @@ public class DefaultService implements ConcertService {
 					return new HashSet<>(bookings);
 				case 401:
 					String message = response.readEntity(String.class);
-					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
-						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
-					}
+					throw new ServiceException(message);
 				default:
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}

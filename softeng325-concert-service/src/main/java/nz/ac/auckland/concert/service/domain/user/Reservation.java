@@ -31,13 +31,17 @@ public class Reservation {
 	@Column(name = "DATE_TIME", nullable = false)
 	private LocalDateTime _date;
 
+	@Column(name = "REQUEST", nullable = false)
+	private Long _timeOfRequest;
+
 	protected Reservation() {
 	}
 
-	public Reservation(Set<Seat> seats, Long concertId, LocalDateTime date) {
+	public Reservation(Long concertId, Set<Seat> seats, LocalDateTime date) {
 		_seats = seats;
 		_concertId = concertId;
 		_date = date;
+		_timeOfRequest = System.currentTimeMillis();
 	}
 
 	public Long getId() {

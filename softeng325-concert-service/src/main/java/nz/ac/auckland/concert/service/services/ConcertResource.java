@@ -6,13 +6,16 @@ import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
 import nz.ac.auckland.concert.service.domain.concert.ConcertSeats;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
+import nz.ac.auckland.concert.service.domain.concert.Seat;
 import nz.ac.auckland.concert.service.domain.user.CreditCard;
+import nz.ac.auckland.concert.service.domain.user.Reservation;
 import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.*;
 import nz.ac.auckland.concert.service.util.TheatreUtility;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
@@ -20,6 +23,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -269,10 +273,11 @@ public class ConcertResource {
 
 			//Find the corresponding ConcertSeats entity
 			TypedQuery<ConcertSeats> concertSeatsQuery =
-					_em.createQuery("SELECT c FROM ConcertSeats c", ConcertSeats.class);
-//			concertSeatsQuery.setParameter("concertId", 1L);
-//			concertSeatsQuery.setParameter("concertDate", date);
-			List<ConcertSeats> concertSeats = concertSeatsQuery.getResultList();
+					_em.createQuery("SELECT c FROM ConcertSeats c WHERE c._id._concertId = :concertId AND c._id._date = :concertDate", ConcertSeats.class);
+			concertSeatsQuery.setParameter("concertId", concertId);
+			concertSeatsQuery.setParameter("concertDate", date);
+
+			List<ConcertSeats> concertSeats = concertSeatsQuery.setMaxResults(1).getResultList();
 
 			if (concertSeats.size() == 0) {
 				throw new BadRequestException(Response
@@ -286,15 +291,39 @@ public class ConcertResource {
 					.collect(Collectors.toSet());
 
 			Set<SeatDTO> reserveSeats = TheatreUtility.findAvailableSeats(numberOfSeats, priceBand, bookedSeats);
+			if (reserveSeats.size() != numberOfSeats) {
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.INSUFFICIENT_SEATS_AVAILABLE_FOR_RESERVATION)
+						.build());
+			}
 
-			//Lock rows
+			Set<Seat> seats = new HashSet<>();
+			for (SeatDTO seat : reserveSeats) {
+				TypedQuery<Seat> seatQuery =
+						_em.createQuery("SELECT s FROM Seat s WHERE s._id._concertId = :concertId AND s._id._date = :date AND s._id._row = :row AND s._id._number = :number", Seat.class)
+								.setLockMode(LockModeType.OPTIMISTIC);
+				seatQuery.setParameter("concertId", concertId);
+				seatQuery.setParameter("date", date);
+				seatQuery.setParameter("row", seat.getRow());
+				seatQuery.setParameter("number", seat.getNumber());
 
-			GenericEntity<Set<SeatDTO>> genericEntity = new GenericEntity<Set<SeatDTO>>(reserveSeats) {
-			};
+				seats.add(seatQuery.getResultList().get(0));
+			}
+
+			concertSeats.get(0).getAvailableSeats().removeAll(seats);
+			concertSeats.get(0).getBookedSeats().addAll(seats);
+			_em.persist(concertSeats.get(0));
+
+			Reservation reservation = new Reservation(concertId, seats, date);
+			_em.persist(reservation);
+			_em.getTransaction().commit();
+
+			ReservationDTO reservationDTO = new ReservationDTO(reservation.getId(), reservationRequest, reserveSeats);
 
 			Response.ResponseBuilder rb = new ResponseBuilderImpl();
-			rb.entity(genericEntity);
-			rb.status(200);
+			rb.entity(reservationDTO);
+			rb.status(201);
 
 			return rb.build();
 		} finally {
