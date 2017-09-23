@@ -3,9 +3,7 @@ package nz.ac.auckland.concert.service.domain.concert;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @Entity
 public class Seat {
@@ -15,6 +13,10 @@ public class Seat {
 
 	@Column(name = "booked", nullable = false)
 	private Boolean _booked = false;
+
+	@ManyToOne
+	@JoinColumn(name = "CONCERT_SEATS_ID")
+	private ConcertSeats _concert;
 
 	protected Seat() {
 	}
