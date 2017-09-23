@@ -21,9 +21,11 @@ public class DefaultService implements ConcertService {
 	@Override
 	public Set<ConcertDTO> getConcerts() throws ServiceException {
 		Response response = null;
-		Client client = ClientBuilder.newClient();
+		Client client = null;
 
 		try {
+			client = ClientBuilder.newClient();
+
 			Builder builder = client.target(WEB_SERVICE_URI).request();
 			response = builder.get();
 
@@ -41,7 +43,6 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
 			response.close();
 			client.close();
 		}
@@ -50,9 +51,11 @@ public class DefaultService implements ConcertService {
 	@Override
 	public Set<PerformerDTO> getPerformers() throws ServiceException {
 		Response response = null;
-		Client client = ClientBuilder.newClient();
+		Client client = null;
 
 		try {
+			client = ClientBuilder.newClient();
+
 			Builder builder = client.target(WEB_SERVICE_URI + "/performers").request();
 			response = builder.get();
 
@@ -69,7 +72,6 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
 			response.close();
 			client.close();
 		}
@@ -78,9 +80,11 @@ public class DefaultService implements ConcertService {
 	@Override
 	public UserDTO createUser(UserDTO newUser) {
 		Response response = null;
-		Client client = ClientBuilder.newClient();
+		Client client = null;
 
 		try {
+			client = ClientBuilder.newClient();
+
 			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
 			response = builder.post(Entity.entity(newUser, javax.ws.rs.core.MediaType.APPLICATION_XML));
 
@@ -101,7 +105,6 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
 			response.close();
 			client.close();
 		}
@@ -110,13 +113,15 @@ public class DefaultService implements ConcertService {
 	@Override
 	public UserDTO authenticateUser(UserDTO user) throws ServiceException {
 		Response response = null;
-		Client client = ClientBuilder.newClient();
+		Client client = null;
 
 		if (user.getUsername() == null || user.getPassword() == null) {
 			throw new ServiceException(Messages.AUTHENTICATE_USER_WITH_MISSING_FIELDS);
 		}
 
 		try {
+			client = ClientBuilder.newClient();
+
 			Builder builder = client.target(WEB_SERVICE_URI + "/user/" + user.getUsername()).request();
 			response = builder.get();
 
@@ -155,21 +160,23 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public ReservationDTO reserveSeats(ReservationRequestDTO reservationRequest) throws ServiceException {
+		Response response = null;
+		Client client = null;
+
 		if (_cookie == null) {
 			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
 		}
 
-		if (reservationRequest.getNumberOfSeats() == 0 ||
-				reservationRequest.getDate() == null ||
-				reservationRequest.getConcertId() == null ||
-				reservationRequest.getSeatType() == null) {
-			throw new ServiceException(Messages.RESERVATION_REQUEST_WITH_MISSING_FIELDS);
-		}
-
-		Response response = null;
-		Client client = ClientBuilder.newClient();
-
 		try {
+			client = ClientBuilder.newClient();
+
+			if (reservationRequest.getNumberOfSeats() == 0 ||
+					reservationRequest.getDate() == null ||
+					reservationRequest.getConcertId() == null ||
+					reservationRequest.getSeatType() == null) {
+				throw new ServiceException(Messages.RESERVATION_REQUEST_WITH_MISSING_FIELDS);
+			}
+
 			Builder builder = client.target(WEB_SERVICE_URI + "/reservation").request();
 			builder.cookie("UUID", _cookie.toString());
 			response = builder.post(Entity.entity(reservationRequest, javax.ws.rs.core.MediaType.APPLICATION_XML));
@@ -181,8 +188,8 @@ public class DefaultService implements ConcertService {
 					return response.readEntity(ReservationDTO.class);
 				case 400:
 					String message = response.readEntity(String.class);
-					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
-						throw new ServiceException(Messages.AUTHENTICATE_NON_EXISTENT_USER);
+					if (message.equals(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE)) {
+						throw new ServiceException(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE);
 					}
 				default:
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
@@ -197,19 +204,21 @@ public class DefaultService implements ConcertService {
 	@Override
 	public void confirmReservation(ReservationDTO reservation) throws ServiceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void registerCreditCard(CreditCardDTO creditCard) throws ServiceException {
+		Response response = null;
+		Client client = null;
+
 		if (_cookie == null) {
 			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
 		}
 
-		Response response = null;
-		Client client = ClientBuilder.newClient();
-
 		try {
+			client = ClientBuilder.newClient();
+
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
 			Builder builder = client.target(WEB_SERVICE_URI + "/user/creditcard").request();
@@ -225,7 +234,7 @@ public class DefaultService implements ConcertService {
 
 			switch (responseCode) {
 				case 204:
-					break;
+					return;
 				case 401:
 					String message = response.readEntity(String.class);
 					if (message.equals(Messages.AUTHENTICATE_NON_EXISTENT_USER)) {
@@ -243,14 +252,16 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public Set<BookingDTO> getBookings() throws ServiceException {
+		Response response = null;
+		Client client = null;
+
 		if (_cookie == null) {
 			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
 		}
 
-		Response response = null;
-		Client client = ClientBuilder.newClient();
-
 		try {
+			client = ClientBuilder.newClient();
+
 			// Make an invocation on a Concert URI and specify Java-
 			// serialization as the required data format.
 			Builder builder = client.target(WEB_SERVICE_URI + "/user").request();
@@ -280,7 +291,6 @@ public class DefaultService implements ConcertService {
 					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
 			}
 		} finally {
-			// Close the Response object.
 			response.close();
 			client.close();
 		}
