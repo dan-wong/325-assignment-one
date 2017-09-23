@@ -4,30 +4,30 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "CONCERT_SEATS")
 public class ConcertSeats {
-	@Id
-	@GeneratedValue
-	private Long _id;
+	@EmbeddedId
+	private ConcertSeatsKey _id;
 
-	@ManyToOne
-	@JoinColumn(name = "CONCERT_ID")
-	private Concert _concert;
-
-	@Column(name = "DATE", nullable = false)
-	private LocalDateTime _date;
-
-	@OneToMany(mappedBy = "_concert")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "AVAILABLE_SEATS")
 	private Set<Seat> _availableSeats;
 
-	@OneToMany(mappedBy = "_concert")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "BOOKED_SEATS")
 	private Set<Seat> _bookedSeats;
 
 	protected ConcertSeats() {
+	}
+
+	public ConcertSeats(ConcertSeatsKey id, Set<Seat> availableSeats) {
+		_id = id;
+		_availableSeats = availableSeats;
+		_bookedSeats = new HashSet<>();
 	}
 
 	@Override
@@ -40,8 +40,6 @@ public class ConcertSeats {
 		ConcertSeats rhs = (ConcertSeats) obj;
 		return new EqualsBuilder().
 				append(_id, rhs._id).
-				append(_concert, rhs._concert).
-				append(_date, rhs._date).
 				append(_availableSeats, rhs._availableSeats).
 				append(_bookedSeats, rhs._bookedSeats).
 				isEquals();
@@ -51,8 +49,6 @@ public class ConcertSeats {
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31)
 				.append(_id)
-				.append(_concert)
-				.append(_date)
 				.append(_availableSeats)
 				.append(_bookedSeats)
 				.hashCode();

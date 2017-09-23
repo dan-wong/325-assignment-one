@@ -29,7 +29,7 @@ public class Concert implements Comparable<Concert> {
 	@Column(name = "TITLE", nullable = false)
 	private String _title;
 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "CONCERT_DATES", joinColumns = @JoinColumn(name = "CONCERT_DATES_ID"))
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "DATES", nullable = false)

@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Composite Primary Key from
@@ -24,12 +25,20 @@ public class SeatKey implements Serializable {
 	@Convert(converter = SeatNumberConverter.class)
 	private SeatNumber _number;
 
+	@Column(name = "CONCERT_ID", nullable = false)
+	private Long _concertId;
+
+	@Column(name = "DATE", nullable = false)
+	private LocalDateTime _date;
+
 	protected SeatKey() {
 	}
 
-	public SeatKey(SeatRow row, SeatNumber number) {
+	public SeatKey(SeatRow row, SeatNumber number, Long concertId, LocalDateTime date) {
 		_row = row;
 		_number = number;
+		_concertId = concertId;
+		_date = date;
 	}
 
 	public SeatRow getSeatRow() {
@@ -38,6 +47,14 @@ public class SeatKey implements Serializable {
 
 	public SeatNumber getSeatNumber() {
 		return _number;
+	}
+
+	public Long getConcertId() {
+		return _concertId;
+	}
+
+	public LocalDateTime getDate() {
+		return _date;
 	}
 
 	@Override
@@ -51,12 +68,16 @@ public class SeatKey implements Serializable {
 		return new EqualsBuilder().
 				append(_row, rhs._row).
 				append(_number, rhs._number).
+				append(_concertId, rhs._concertId).
+				append(_date, rhs._date).
 				isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31).
+				append(_concertId).
+				append(_date).
 				append(_row).
 				append(_number).
 				hashCode();
