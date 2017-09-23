@@ -2,11 +2,14 @@ package nz.ac.auckland.concert.service.services;
 
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
+import nz.ac.auckland.concert.common.types.PriceBand;
 import nz.ac.auckland.concert.service.domain.concert.Concert;
+import nz.ac.auckland.concert.service.domain.concert.ConcertSeats;
 import nz.ac.auckland.concert.service.domain.concert.Performer;
 import nz.ac.auckland.concert.service.domain.user.CreditCard;
 import nz.ac.auckland.concert.service.domain.user.User;
 import nz.ac.auckland.concert.service.mappers.*;
+import nz.ac.auckland.concert.service.util.TheatreUtility;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 
 import javax.persistence.EntityManager;
@@ -16,7 +19,9 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -241,32 +246,61 @@ public class ConcertResource {
 		}
 	}
 
-//	@POST
-//	@Path("/reservation")
-//	public Response createReservation(@CookieParam("UUID") Cookie cookie, ReservationRequestDTO reservationRequest) {
-//		try {
-//			_em.getTransaction().begin();
-//
-//			//Check user authentication is OK
-//			User user = authenticateUser(cookie);
-//
-//			if (user == null) {
-//				throw new BadRequestException(Response
-//						.status(Response.Status.BAD_REQUEST)
-//						.entity(Messages.BAD_AUTHENTICATON_TOKEN)
-//						.build());
-//			}
-//
-//			int numberOfSeats = reservationRequest.getNumberOfSeats();
-//			PriceBand priceBand = reservationRequest.getSeatType();
-//			Long concertId = reservationRequest.getConcertId();
-//			LocalDateTime date = reservationRequest.getDate();
-//
-//			return null;
-//		} finally {
-//			_em.close();
-//		}
-//	}
+	@POST
+	@Path("/reservation")
+	public Response createReservation(@CookieParam("UUID") Cookie cookie, ReservationRequestDTO reservationRequest) {
+		try {
+			_em.getTransaction().begin();
+
+			//Check user authentication is OK
+			User user = authenticateUser(cookie);
+
+			if (user == null) {
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.BAD_AUTHENTICATON_TOKEN)
+						.build());
+			}
+
+			int numberOfSeats = reservationRequest.getNumberOfSeats();
+			PriceBand priceBand = reservationRequest.getSeatType();
+			Long concertId = reservationRequest.getConcertId();
+			LocalDateTime date = reservationRequest.getDate();
+
+			//Find the corresponding ConcertSeats entity
+			TypedQuery<ConcertSeats> concertSeatsQuery =
+					_em.createQuery("SELECT c FROM ConcertSeats c", ConcertSeats.class);
+//			concertSeatsQuery.setParameter("concertId", 1L);
+//			concertSeatsQuery.setParameter("concertDate", date);
+			List<ConcertSeats> concertSeats = concertSeatsQuery.getResultList();
+
+			if (concertSeats.size() == 0) {
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.CONCERT_NOT_SCHEDULED_ON_RESERVATION_DATE)
+						.build());
+			}
+
+			Set<SeatDTO> bookedSeats = concertSeats.get(0).getBookedSeats().stream()
+					.map(SeatMapper::convertToDTO)
+					.collect(Collectors.toSet());
+
+			Set<SeatDTO> reserveSeats = TheatreUtility.findAvailableSeats(numberOfSeats, priceBand, bookedSeats);
+
+			//Lock rows
+
+			GenericEntity<Set<SeatDTO>> genericEntity = new GenericEntity<Set<SeatDTO>>(reserveSeats) {
+			};
+
+			Response.ResponseBuilder rb = new ResponseBuilderImpl();
+			rb.entity(genericEntity);
+			rb.status(200);
+
+			return rb.build();
+		} finally {
+			_em.close();
+		}
+	}
 
 	private User authenticateUser(Cookie cookie) {
 		if (cookie == null) {

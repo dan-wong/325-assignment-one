@@ -30,6 +30,14 @@ public class ConcertSeats {
 		_bookedSeats = new HashSet<>();
 	}
 
+	public Set<Seat> getAvailableSeats() {
+		return _availableSeats;
+	}
+
+	public Set<Seat> getBookedSeats() {
+		return _bookedSeats;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ConcertSeats))
