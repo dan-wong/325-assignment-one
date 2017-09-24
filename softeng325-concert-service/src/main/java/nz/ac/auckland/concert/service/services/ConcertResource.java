@@ -3,10 +3,7 @@ package nz.ac.auckland.concert.service.services;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
 import nz.ac.auckland.concert.common.types.PriceBand;
-import nz.ac.auckland.concert.service.domain.concert.Concert;
-import nz.ac.auckland.concert.service.domain.concert.ConcertSeats;
-import nz.ac.auckland.concert.service.domain.concert.Performer;
-import nz.ac.auckland.concert.service.domain.concert.Seat;
+import nz.ac.auckland.concert.service.domain.concert.*;
 import nz.ac.auckland.concert.service.domain.user.CreditCard;
 import nz.ac.auckland.concert.service.domain.user.Reservation;
 import nz.ac.auckland.concert.service.domain.user.User;
@@ -308,7 +305,7 @@ public class ConcertResource {
 				seatQuery.setParameter("row", seat.getRow());
 				seatQuery.setParameter("number", seat.getNumber());
 
-				seats.add(seatQuery.getResultList().get(0));
+				seats.add(seatQuery.getSingleResult());
 			}
 
 			concertSeats.get(0).getAvailableSeats().removeAll(seats);
@@ -324,6 +321,53 @@ public class ConcertResource {
 			Response.ResponseBuilder rb = new ResponseBuilderImpl();
 			rb.entity(reservationDTO);
 			rb.status(201);
+
+			return rb.build();
+		} finally {
+			_em.close();
+		}
+	}
+
+	@PUT
+	@Path("/reservation")
+	public Response confirmReservation(@CookieParam("UUID") Cookie cookie, ReservationDTO reservationDTO) {
+		try {
+			_em.getTransaction().begin();
+
+			//Check user authentication is OK
+			User user = authenticateUser(cookie);
+
+			if (user == null) {
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.BAD_AUTHENTICATON_TOKEN)
+						.build());
+			} else if (user.getCreditCards().size() == 0) {
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.CREDIT_CARD_NOT_REGISTERED)
+						.build());
+			}
+
+			//Get the reservation domain object
+			Reservation reservation = _em.find(Reservation.class, reservationDTO.getId());
+
+			if (System.currentTimeMillis() - reservation.getTimeOfRequest() > ConcertApplication.RESERVATION_EXPIRY_TIME_IN_SECONDS * 1000) {
+				_em.remove(reservation);
+				throw new BadRequestException(Response
+						.status(Response.Status.BAD_REQUEST)
+						.entity(Messages.EXPIRED_RESERVATION)
+						.build());
+			}
+
+			Concert concert = _em.find(Concert.class, reservation.getConcertId());
+			Booking booking = new Booking(concert, reservation.getDateOfConcert(), reservation.getSeats(), reservationDTO.getReservationRequest().getSeatType());
+
+			user.addBooking(booking);
+			_em.persist(user);
+
+			Response.ResponseBuilder rb = new ResponseBuilderImpl();
+			rb.status(204);
 
 			return rb.build();
 		} finally {

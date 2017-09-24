@@ -65,6 +65,10 @@ public class User {
 		return _lastName;
 	}
 
+	public void addBooking(Booking booking) {
+		_bookings.add(booking);
+	}
+
 	public Set<Booking> getBookings() {
 		return _bookings;
 	}

@@ -218,8 +218,40 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public void confirmReservation(ReservationDTO reservation) throws ServiceException {
-		// TODO Auto-generated method stub
+		Response response = null;
+		Client client = null;
 
+		if (_cookie == null) {
+			throw new ServiceException(Messages.UNAUTHENTICATED_REQUEST);
+		}
+
+		try {
+			client = ClientBuilder.newClient();
+
+			Builder builder = client.target(WEB_SERVICE_URI + "/reservation").request();
+			builder.cookie("UUID", _cookie.toString());
+			response = builder.put(Entity.entity(reservation, javax.ws.rs.core.MediaType.APPLICATION_XML));
+
+			int responseCode = response.getStatus();
+
+			switch (responseCode) {
+				case 204:
+					return;
+				case 400:
+					String message = response.readEntity(String.class);
+					throw new ServiceException(message);
+				default:
+					throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+			}
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+
+			if (client != null) {
+				client.close();
+			}
+		}
 	}
 
 	@Override

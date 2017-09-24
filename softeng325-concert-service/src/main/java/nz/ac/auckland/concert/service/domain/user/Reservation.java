@@ -48,6 +48,22 @@ public class Reservation {
 		return _id;
 	}
 
+	public Long getConcertId() {
+		return _concertId;
+	}
+
+	public Set<Seat> getSeats() {
+		return _seats;
+	}
+
+	public LocalDateTime getDateOfConcert() {
+		return _date;
+	}
+
+	public Long getTimeOfRequest() {
+		return _timeOfRequest;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Reservation))

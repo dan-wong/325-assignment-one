@@ -31,8 +31,7 @@ public class Booking {
 	protected Booking() {
 	}
 
-	public Booking(Long id, Concert concert, LocalDateTime localDateTime, Set<Seat> seats, PriceBand priceBand) {
-		_id = id;
+	public Booking(Concert concert, LocalDateTime localDateTime, Set<Seat> seats, PriceBand priceBand) {
 		_concert = concert;
 		_dateTime = localDateTime;
 		_seats = seats;
