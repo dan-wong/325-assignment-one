@@ -3,6 +3,7 @@ package nz.ac.auckland.concert.service.domain.user;
 import nz.ac.auckland.concert.service.domain.concert.Booking;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,7 +28,6 @@ public class User {
 	private String _lastName;
 
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "id", nullable = false)
 	private Set<Booking> _bookings;
 
 	@OneToMany(cascade = CascadeType.ALL)
@@ -43,6 +43,9 @@ public class User {
 		_password = password;
 		_firstName = firstName;
 		_lastName = lastName;
+
+		_bookings = new HashSet<>();
+		_creditCards = new HashSet<>();
 	}
 
 	public Long getID() {

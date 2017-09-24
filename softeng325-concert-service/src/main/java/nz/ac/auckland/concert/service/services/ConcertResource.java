@@ -362,9 +362,10 @@ public class ConcertResource {
 
 			Concert concert = _em.find(Concert.class, reservation.getConcertId());
 			Booking booking = new Booking(concert, reservation.getDateOfConcert(), reservation.getSeats(), reservationDTO.getReservationRequest().getSeatType());
-
 			user.addBooking(booking);
-			_em.persist(user);
+
+			_em.merge(user);
+			_em.getTransaction().commit();
 
 			Response.ResponseBuilder rb = new ResponseBuilderImpl();
 			rb.status(204);
