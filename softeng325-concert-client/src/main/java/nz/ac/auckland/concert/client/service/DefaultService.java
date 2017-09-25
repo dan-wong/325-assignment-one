@@ -1,8 +1,20 @@
 package nz.ac.auckland.concert.client.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.transfer.Download;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import nz.ac.auckland.concert.common.dto.*;
 import nz.ac.auckland.concert.common.message.Messages;
 
+import javax.imageio.ImageIO;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -11,8 +23,11 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DefaultService implements ConcertService {
 	private static String WEB_SERVICE_URI = "http://localhost:10000/services/concerts";
@@ -167,8 +182,56 @@ public class DefaultService implements ConcertService {
 
 	@Override
 	public Image getImageForPerformer(PerformerDTO performer) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		// AWS S3 access credentials for concert images.
+		String AWS_ACCESS_KEY_ID = "AKIAIDYKYWWUZ65WGNJA";
+		String AWS_SECRET_ACCESS_KEY = "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";
+
+		// Name of the S3 bucket that stores images.
+		String AWS_BUCKET = "concert.aucklanduni.ac.nz";
+
+		// Create an AmazonS3 object that represents a connection with the
+		// remote S3 service.
+		BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
+				AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
+		AmazonS3 s3 = AmazonS3ClientBuilder
+				.standard()
+				.withRegion(Regions.AP_SOUTHEAST_2)
+				.withCredentials(
+						new AWSStaticCredentialsProvider(awsCredentials))
+				.build();
+
+		// Find images names stored in S3.
+		ObjectListing ol = s3.listObjects(AWS_BUCKET);
+		List<S3ObjectSummary> objects = ol.getObjectSummaries();
+		List<String> imageNames = objects.stream().map(S3ObjectSummary::getKey).collect(Collectors.toList());
+
+		String imageName = performer.getImageName();
+
+		if (!imageNames.contains(imageName)) {
+			throw new ServiceException(Messages.NO_IMAGE_FOR_PERFORMER);
+		}
+
+		// Download the images.
+		TransferManager mgr = TransferManagerBuilder
+				.standard()
+				.withS3Client(s3)
+				.build();
+
+		File f = new File(imageName);
+		try {
+			Download xfer = mgr.download(AWS_BUCKET, imageName, f);
+			// loop with Transfer.isDone()
+			// or block with Transfer.waitForCompletion()
+		} catch (AmazonServiceException e) {
+			throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+		}
+		mgr.shutdownNow();
+
+		try {
+			return ImageIO.read(f);
+		} catch (IOException e) {
+			throw new ServiceException(Messages.SERVICE_COMMUNICATION_ERROR);
+		}
 	}
 
 	@Override
